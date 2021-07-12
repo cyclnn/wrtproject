@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "775423959688",
+    "project_id": "world-romance-translation",
+    "storage_bucket": "world-romance-translation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775423959688:android:2a76f5727c67ae6685353d",
+        "android_client_info": {
+          "package_name": "com.example.wrtproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "775423959688-sdllou4t9mq2pk8u7lni49v8sc22mvrl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUXyWVoQjiEsU4uh_az2vWA4v5K-PiBAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "775423959688-sdllou4t9mq2pk8u7lni49v8sc22mvrl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
