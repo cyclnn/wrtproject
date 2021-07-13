@@ -1,6 +1,6 @@
 # WRT
 
-A new Flutter project.
+Aplikasi komik World Romance Translation.
 
 ## Getting Started
 
