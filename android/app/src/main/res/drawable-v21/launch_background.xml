@@ -3,11 +3,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape>
-<<<<<<< HEAD
-            <solid android:color="#e444ee" />
-=======
             <solid android:color="#673ab7" />
->>>>>>> 422a828 (Version 2.0.0(Beta))
         </shape>
     </item>
 
