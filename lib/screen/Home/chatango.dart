@@ -1,7 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:wrtproject/mesin/const.dart';
 
 class Chatango extends StatefulWidget {
   @override
@@ -13,7 +13,7 @@ class _ChatangoState extends State<Chatango> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+          backgroundColor: Const.baseColor,
           title: Text("Chatango"),
         ),
         body: WebViewPlus(

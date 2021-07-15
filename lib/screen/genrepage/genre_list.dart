@@ -1,7 +1,8 @@
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
-import 'package:wrtproject/screen/detail_genre.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/genrepage/detail_genre.dart';
 
 class Genlist extends StatefulWidget {
   @override
@@ -39,16 +40,15 @@ class _GenlistState extends State<Genlist> {
 
   @override
   Widget build(BuildContext context) {
-    Size screensize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+        backgroundColor: Const.baseColor,
         title: Text("Daftar Genre"),
       ),
       body: Container(
           decoration: BoxDecoration(
-            color: Color.fromRGBO(34, 34, 34, 1),
+            color: Const.bgcolor,
           ),
           width: double.infinity,
           child: SingleChildScrollView(
@@ -71,7 +71,7 @@ class _GenlistState extends State<Genlist> {
                                       child: Container(
                                         width: double.infinity,
                                         height: 30,
-                                        color: Colors.grey[200],
+                                        color: Const.cardcolor,
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -80,7 +80,7 @@ class _GenlistState extends State<Genlist> {
                                               child: Text(
                                                 namagenre[i]['title'],
                                                 style: TextStyle(
-                                                    color: Colors.black,
+                                                    color: Const.text,
                                                     fontSize: 20,
                                                     fontWeight:
                                                         FontWeight.bold),
@@ -117,7 +117,7 @@ class _GenlistState extends State<Genlist> {
                         child: Center(
                             child: CircularProgressIndicator(
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                              AlwaysStoppedAnimation<Color>(Const.text2),
                         )),
                       )
               ],

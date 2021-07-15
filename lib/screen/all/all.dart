@@ -1,12 +1,8 @@
-import 'dart:async';
-import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/all/recent.dart';
-import 'package:wrtproject/screen/home.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wrtproject/screen/pj.dart';
-import 'package:wrtproject/screen/semua.dart';
+import 'package:wrtproject/screen/all/pj.dart';
+import 'package:wrtproject/screen/all/semua.dart';
 
 class Semua extends StatefulWidget {
   @override
@@ -29,15 +25,14 @@ class _SemuaState extends State<Semua> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    Size screensize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 75,
-        backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+        backgroundColor: Const.baseColor,
         bottom: TabBar(
           controller: controller,
-          unselectedLabelColor: Colors.white,
-          indicatorColor: Colors.blue,
+          unselectedLabelColor: Const.unselected,
+          indicatorColor: Const.selected,
           tabs: <Widget>[
             Tab(
               icon: Icon(

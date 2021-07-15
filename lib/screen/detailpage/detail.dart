@@ -1,17 +1,18 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
-import 'package:wrtproject/screen/chapter.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/detailpage/chapter.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:wrtproject/screen/home.dart';
-import 'package:wrtproject/screen/komen.dart';
-import 'package:wrtproject/screen/read.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wrtproject/mesin/database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:wrtproject/screen/detail_genre.dart';
+import 'package:wrtproject/screen/komen/komen.dart';
+import 'package:wrtproject/screen/nullpage/page.dart';
+import 'package:wrtproject/screen/read/read.dart';
+import 'package:wrtproject/screen/genrepage/detail_genre.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 
 class Detail extends StatefulWidget {
   final String lnk, nama, gambar;
@@ -45,11 +46,23 @@ class _DetailState extends State<Detail> {
   List<Map<String, dynamic>> sinop3;
   List<Map<String, dynamic>> sinop4;
   List<Map<String, dynamic>> sinop5;
-  var panjang, isi, hcap, hurl, hurut, hid, idd;
+  List<Map<String, dynamic>> views;
+  var panjang, isi, idd;
+  Preference hurl, hcap;
+  Preference hid;
+  Preference hurut;
+  var preferences;
 
   double _sigmaX = 10; // from 0-10
   double _sigmaY = 10; // from 0-10
   double _opacity = 0.5; // from 0-1.0
+
+  void main() async {
+    await Hive.openBox('title');
+    await Hive.openBox('gambar');
+    await Hive.openBox('url');
+    await Hive.openBox('idbookmark');
+  }
 
   void fetchInfo() async {
     String tempBaseUrl = widget.lnk.split(".my.id")[0] + ".my.id";
@@ -75,6 +88,8 @@ class _DetailState extends State<Detail> {
 
       rilis = scraper.getElement(
           "div.bigcontent > div.infox > div.flex-wrap > div.fmed ", ['title']);
+      views = scraper.getElement(
+          "div.bigcontent > div.infox > div.flex-wrap > div.fmed > span", []);
       status = scraper.getElement(
           "div.bigcontent > div.thumbook > div.rt > div.tsinfo", ['title']);
       genre = scraper.getElement(
@@ -97,12 +112,12 @@ class _DetailState extends State<Detail> {
       id = scraper.getElement("article", ['id']);
 
       get() async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
+        preferences = await StreamingSharedPreferences.instance;
         idd = id[0]['attributes']['id'];
-        hcap = prefs.getString("hchap " + idd);
-        hurl = prefs.getString("hurl " + idd);
-        hurut = prefs.getInt("hurut" + idd);
-        hid = prefs.getString("hid " + idd);
+        hcap = preferences.getString("hcap " + idd, defaultValue: "No History");
+        hurl = preferences.getString("hurl " + idd, defaultValue: "null");
+        hurut = preferences.getInt("hurut " + idd);
+        hid = preferences.getString("hid " + idd);
       }
 
       setState(() {
@@ -123,9 +138,42 @@ class _DetailState extends State<Detail> {
           isi = sinop5;
         }
         load = true;
-        print(sinop3.length);
         get();
+        print(id[0]['attributes']['id']);
       });
+    }
+  }
+
+  void bookmark() async {
+    var title = await Hive.openBox('title');
+    title.add(widget.nama); // index 0, key 0
+
+    var url = await Hive.openBox('url');
+    url.add(widget.lnk); // index 0, key 0
+
+    var gambar = await Hive.openBox('gambar');
+    gambar.add(widget.gambar); // index 0, key 0
+
+    var id = await Hive.openBox('idbookmark');
+    id.put(idd, idd);
+  }
+
+  void delbookmark() async {
+    var id = Hive.box('idbookmark');
+
+    for (var i = 0; i <= id.length; i++) {
+      if (id.getAt(i) == idd) {
+        var title = Hive.box('title');
+        title.deleteAt(i);
+
+        var url = Hive.box('url');
+        url.deleteAt(i); // index 0, key 0
+
+        var gambar = Hive.box('gambar');
+        gambar.deleteAt(i); // index 0, key 0
+
+        id.deleteAt(i);
+      }
     }
   }
 
@@ -133,16 +181,19 @@ class _DetailState extends State<Detail> {
   void initState() {
     super.initState();
     fetchInfo();
+    main();
+    setState(() {
+      fetchInfo();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth auth = FirebaseAuth.instance;
-
     Size screensize = MediaQuery.of(context).size;
+    var cek = Hive.box('idbookmark');
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+        backgroundColor: Const.baseColor,
         title: Text('Detail Manga'),
       ),
       body: load
@@ -158,7 +209,7 @@ class _DetailState extends State<Detail> {
                   BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: _sigmaX, sigmaY: _sigmaY),
                     child: Container(
-                      color: Colors.black.withOpacity(_opacity),
+                      color: Const.baseColor.withOpacity(_opacity),
                     ),
                   ),
                   SingleChildScrollView(
@@ -221,49 +272,69 @@ class _DetailState extends State<Detail> {
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16),
                                         ),
-                                        if (Database.getData(
-                                                id[0]['attributes']['id']) !=
-                                            null)
-                                          SizedBox(
-                                            width: 120,
-                                            height: 30,
-                                            child: FlatButton.icon(
-                                                color: Colors.redAccent,
-                                                onPressed: () async {
-                                                  try {
-                                                    Database.createOrupdate(
-                                                            id[0]['attributes']
-                                                                ['id'],
-                                                            nama: widget.nama,
-                                                            link: widget.lnk,
-                                                            img: widget.gambar)
-                                                        .then((value) => Navigator
-                                                            .pushReplacement(
-                                                                context,
-                                                                PageTransition(
-                                                                    type: PageTransitionType
-                                                                        .leftToRight,
-                                                                    child:
-                                                                        Home())));
-                                                  } on FirebaseAuthException catch (e) {
-                                                    Alert(
-                                                            context: context,
-                                                            title: "Error",
-                                                            desc: e.message)
-                                                        .show();
-                                                  }
+                                        (cek.get(idd) != idd)
+                                            ? GestureDetector(
+                                                onTap: () async {
+                                                  bookmark();
+                                                  setState(() {
+                                                    cek.get(idd);
+                                                  });
                                                 },
-                                                icon: Icon(
-                                                  Icons.favorite,
-                                                  color: Colors.white,
-                                                  size: 20,
-                                                ),
-                                                label: Text(
-                                                  "Bookmark",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                )),
-                                          ),
+                                                child: AnimatedContainer(
+                                                    height: 40,
+                                                    duration: Duration(
+                                                        milliseconds: 800),
+                                                    color: Colors.redAccent,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.favorite,
+                                                          color: Colors.white,
+                                                          size: 20,
+                                                        ),
+                                                        Text(
+                                                          "Bookmark",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        )
+                                                      ],
+                                                    )),
+                                              )
+                                            : GestureDetector(
+                                                onTap: () async {
+                                                  delbookmark();
+                                                  setState(() {
+                                                    cek.get(idd);
+                                                  });
+                                                },
+                                                child: AnimatedContainer(
+                                                    height: 40,
+                                                    duration: Duration(
+                                                        milliseconds: 800),
+                                                    color: Colors.greenAccent,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.favorite,
+                                                          color: Colors.white,
+                                                          size: 20,
+                                                        ),
+                                                        Text(
+                                                          "Bookmarked",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        )
+                                                      ],
+                                                    )),
+                                              )
                                       ],
                                     ),
                                   ),
@@ -361,6 +432,31 @@ class _DetailState extends State<Detail> {
                                             fontSize: 14),
                                       ),
                                     ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 4, bottom: 4),
+                                      child: (views.length < 7)
+                                          ? Text(
+                                              "Views : " +
+                                                  views[4]['title']
+                                                      .toString()
+                                                      .trim(),
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14),
+                                            )
+                                          : Text(
+                                              "Views : " +
+                                                  views[6]['title']
+                                                      .toString()
+                                                      .trim(),
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 14),
+                                            ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -396,10 +492,12 @@ class _DetailState extends State<Detail> {
                                               sinop[i]['title']
                                                   .toString()
                                                   .trim(),
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 14),
+                                              style: GoogleFonts.archivoNarrow(
+                                                  textStyle: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 14)),
                                             ),
                                         ],
                                       )
@@ -491,18 +589,15 @@ class _DetailState extends State<Detail> {
                                                         ),
                                                       )),
                                                   onTap: () {
-                                                    Navigator.of(context).push(
-                                                        PageTransition(
-                                                            type:
-                                                                PageTransitionType
-                                                                    .bottomToTop,
-                                                            child: Detgen(
-                                                                url: linkgenre[
-                                                                            i][
-                                                                        'attributes']
-                                                                    ['href'],
-                                                                nama: genre[i][
-                                                                    'title'])));
+                                                    Get.to(
+                                                        () => Detgen(
+                                                            url: linkgenre[i][
+                                                                    'attributes']
+                                                                ['href'],
+                                                            nama: genre[i]
+                                                                ['title']),
+                                                        transition:
+                                                            Transition.zoom);
                                                   },
                                                 )),
                                         ])
@@ -558,21 +653,15 @@ class _DetailState extends State<Detail> {
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     children: [
-                                                      (hcap != null)
-                                                          ? Text(
-                                                              "Chapter" +
-                                                                  hcap.toString(),
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal),
-                                                            )
-                                                          : Center(
-                                                              child: Text(
-                                                                "Belum Ada History",
+                                                      PreferenceBuilder<String>(
+                                                          preference: hcap,
+                                                          builder: (BuildContext
+                                                                      context,
+                                                                  String
+                                                                      snapshot) =>
+                                                              Text(
+                                                                snapshot
+                                                                    .toString(),
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .white,
@@ -581,27 +670,54 @@ class _DetailState extends State<Detail> {
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .normal),
-                                                              ),
-                                                            ),
+                                                              ))
                                                     ],
                                                   ),
                                                 )),
                                           ),
                                           onTap: () {
-                                            Navigator.of(context).push(
-                                                PageTransition(
-                                                    type: PageTransitionType
-                                                        .bottomToTop,
-                                                    child: Read(
-                                                      link: hurl.toString(),
-                                                      linkkomik: widget.lnk,
-                                                      urut: hurut,
-                                                      id: id[0]['attributes']
-                                                          ['id'],
-                                                      linkdet: widget.lnk,
-                                                      namakom: widget.nama,
-                                                      img: widget.gambar,
-                                                    )));
+                                            Get.to(
+                                                () => PreferenceBuilder<int>(
+                                                    preference: hurut,
+                                                    builder:
+                                                        (BuildContext context,
+                                                                int hurutt) =>
+                                                            PreferenceBuilder<
+                                                                String>(
+                                                              preference: hurl,
+                                                              builder: (BuildContext
+                                                                          context,
+                                                                      String
+                                                                          hurll) =>
+                                                                  PreferenceBuilder<
+                                                                      String>(
+                                                                preference: hid,
+                                                                builder: (BuildContext
+                                                                            context,
+                                                                        String
+                                                                            hidd) =>
+                                                                    (hurll != "null" ||
+                                                                            hurll !=
+                                                                                null)
+                                                                        ? Read(
+                                                                            link:
+                                                                                hurll,
+                                                                            linkkomik:
+                                                                                widget.lnk,
+                                                                            urut:
+                                                                                hurutt,
+                                                                            id: hidd,
+                                                                            linkdet:
+                                                                                widget.lnk,
+                                                                            namakom:
+                                                                                widget.nama,
+                                                                            img:
+                                                                                widget.gambar,
+                                                                          )
+                                                                        : NullPage(),
+                                                              ),
+                                                            )),
+                                                transition: Transition.zoom);
                                           },
                                         )),
                                   ],
@@ -659,11 +775,8 @@ class _DetailState extends State<Detail> {
                                                           timech: chtime[i]
                                                               ['title']),
                                                       onTap: () {
-                                                        Navigator.of(context).push(
-                                                            PageTransition(
-                                                                type: PageTransitionType
-                                                                    .bottomToTop,
-                                                                child: Read(
+                                                        Get.to(
+                                                            () => Read(
                                                                   link: linkch[
                                                                               i]
                                                                           [
@@ -684,7 +797,10 @@ class _DetailState extends State<Detail> {
                                                                           .nama,
                                                                   img: widget
                                                                       .gambar,
-                                                                )));
+                                                                ),
+                                                            transition:
+                                                                Transition
+                                                                    .zoom);
                                                       },
                                                     )
                                                 ])
@@ -765,22 +881,21 @@ class _DetailState extends State<Detail> {
                 Container(
                     width: double.infinity,
                     height: screensize.height,
-                    decoration:
-                        BoxDecoration(color: Color.fromRGBO(22, 21, 29, 1)),
+                    decoration: BoxDecoration(color: Const.bgcolor),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CircularProgressIndicator(
                             valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                                AlwaysStoppedAnimation<Color>(Const.text2),
                           ),
                           SizedBox(
                             height: 20,
                           ),
                           Text(
                             "Loading...",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            style: TextStyle(fontSize: 18, color: Const.text2),
                           )
                         ],
                       ),

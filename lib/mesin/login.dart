@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:wrtproject/mesin/register.dart';
-import 'package:wrtproject/screen/home.dart';
-import 'package:wrtproject/screen/setting.dart';
+import 'package:wrtproject/screen/Home/home.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _email = TextEditingController();
@@ -84,14 +82,11 @@ class LoginScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     try {
-                      UserCredential result = await auth
+                      auth
                           .signInWithEmailAndPassword(
                               email: _email.text, password: _password.text)
-                          .then((value) => Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.leftToRight,
-                                  child: Home())));
+                          .then((value) => Get.to(() => Home(),
+                              transition: Transition.downToUp));
                     } on FirebaseAuthException catch (e) {
                       Alert(context: context, title: "Error", desc: e.message)
                           .show();
@@ -119,11 +114,7 @@ class LoginScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 100),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.leftToRight,
-                                  child: Register()));
+                          Get.to(() => Register());
                         },
                         child: Text('Daftar',
                             style: TextStyle(

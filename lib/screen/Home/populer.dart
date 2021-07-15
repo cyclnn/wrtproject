@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Populer extends StatelessWidget {
   final String komikImg, komikTitle, chhot, star;
@@ -22,7 +24,20 @@ class Populer extends StatelessWidget {
               ),
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(50))),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(4),
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 4,
+                      blurRadius: 5,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
                 width: 150,
                 height: 150,
                 child: CachedNetworkImage(
@@ -32,9 +47,14 @@ class Populer extends StatelessWidget {
                     width: 120,
                     height: 150,
                     child: Center(
-                      child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                          strokeWidth: 2,
+                        ),
                       ),
                     ),
                   ),
@@ -48,7 +68,11 @@ class Populer extends StatelessWidget {
                 width: 120,
                 child: Text(
                   komikTitle,
-                  style: TextStyle(color: Colors.white),
+                  style: GoogleFonts.firaSans(
+                      textStyle: TextStyle(
+                    color: Const.text,
+                    fontWeight: FontWeight.bold,
+                  )),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -60,7 +84,10 @@ class Populer extends StatelessWidget {
                 width: 120,
                 child: Text(
                   chhot,
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(
+                    color: Const.textsm,
+                    fontSize: 12,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:wrtproject/screen/detail.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/detailpage/detail.dart';
 
 class Detgen extends StatefulWidget {
   final url, nama;
@@ -57,7 +58,7 @@ class _DetgenState extends State<Detgen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+        backgroundColor: Const.baseColor,
         title: Text(widget.nama),
       ),
       body: Container(

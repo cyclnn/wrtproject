@@ -1,10 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:wrtproject/screen/all.dart';
-import 'package:wrtproject/screen/bookmark.dart';
-import 'package:wrtproject/screen/dash.dart';
-import 'package:wrtproject/screen/genre_list.dart';
-import 'package:wrtproject/screen/setting.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/all/all.dart';
+import 'package:wrtproject/screen/bookmark/bookmark.dart';
+import 'package:wrtproject/screen/Home/dash.dart';
+import 'package:wrtproject/screen/genrepage/genre_list.dart';
+import 'package:wrtproject/screen/setting/setting.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,9 +32,9 @@ class _HomeState extends State<Home> {
         height: 60,
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Color.fromRGBO(228, 68, 238, 1),
-          unselectedItemColor: Colors.white,
-          selectedItemColor: Colors.blueAccent,
+          backgroundColor: Const.baseColor,
+          unselectedItemColor: Const.unselected,
+          selectedItemColor: Const.selected,
           currentIndex: navIndex,
           onTap: selectNavBot,
           items: [
@@ -41,7 +42,7 @@ class _HomeState extends State<Home> {
             BottomNavigationBarItem(icon: Icon(Icons.all_inbox), label: 'All'),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Genres'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.bookmark), label: 'Bookmark'),
+                icon: new Icon(MdiIcons.bookmarkCheck), label: 'Bookmark'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Akun'),
           ],
         ),

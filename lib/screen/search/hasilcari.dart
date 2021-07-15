@@ -1,10 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
-import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:wrtproject/screen/detail.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/detailpage/detail.dart';
 
 class Cari extends StatefulWidget {
   String query;
@@ -57,13 +55,13 @@ class _CariState extends State<Cari> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+          backgroundColor: Const.baseColor,
           title: Text("Cari " + widget.query),
         ),
         body: (komikLoad == true)
             ? Container(
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(34, 34, 34, 1),
+                  color: Const.bgcolor,
                 ),
                 width: double.infinity,
                 height: screensize.height,
@@ -125,8 +123,8 @@ class _CariState extends State<Cari> {
                                             child: Text(
                                               namakomik[i]['attributes']
                                                   ['title'],
-                                              style: TextStyle(
-                                                  color: Colors.white),
+                                              style:
+                                                  TextStyle(color: Const.text2),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -141,7 +139,7 @@ class _CariState extends State<Cari> {
                                                   .toString()
                                                   .trim(),
                                               style: TextStyle(
-                                                  color: Colors.grey,
+                                                  color: Const.textsm2,
                                                   fontSize: 12),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -169,13 +167,13 @@ class _CariState extends State<Cari> {
                             )
                           : Container(
                               width: double.infinity,
-                              color: Color.fromRGBO(34, 34, 34, 1),
+                              color: Const.bgcolor,
                               height: MediaQuery.of(context).size.height,
                               child: Center(
                                   child: Text(
                                 "Nggak Ada Kak",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 25),
+                                style:
+                                    TextStyle(color: Const.text2, fontSize: 25),
                               )),
                             )
                     ],
@@ -183,11 +181,11 @@ class _CariState extends State<Cari> {
                 ))
             : Container(
                 width: double.infinity,
-                color: Color.fromRGBO(34, 34, 34, 1),
+                color: Const.bgcolor,
                 height: MediaQuery.of(context).size.height,
                 child: Center(
                     child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(Const.text2),
                 )),
               ));
     //

@@ -3,10 +3,11 @@ import 'package:web_scraper/web_scraper.dart';
 import 'package:flutter/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:wrtproject/screen/komen.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/komen/komen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:wrtproject/screen/lapor/lapor.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 class Read extends StatefulWidget {
   final String link, linkkomik, namakom, linkdet, img, id;
@@ -36,8 +37,9 @@ class _ReadState extends State<Read> {
   List<Map<String, dynamic>> namach;
   List<Map<String, dynamic>> komen;
   List<Map<String, dynamic>> ch;
-  String akhir2;
+  String akhir2, akhir3;
   var panjang, url;
+  var preferences;
 
   int load = 0;
 
@@ -59,6 +61,8 @@ class _ReadState extends State<Read> {
 
       String akhir = ch[0]['title'].split("Chapter")[1];
       akhir2 = akhir.split("Bahasa")[0];
+      akhir3 = akhir.split("Bahasa")[0];
+      
 
       setState(() {
         if (blogger.length > 1) {
@@ -77,22 +81,23 @@ class _ReadState extends State<Read> {
           panjang = kc.length;
           url = kc;
         }
-
+        akhir3 = akhir.split("Bahasa")[0];
         load = 1;
       });
     }
   }
 
-  Future<void> recent() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future.delayed(const Duration(seconds: 5), () async {
-      await prefs.setString("hchap " + widget.id, akhir2);
-      await prefs.setString("hurl " + widget.id, widget.link);
-      await prefs.setInt("hurut " + widget.id, widget.urut);
-      await prefs.setString("hid " + widget.id, widget.id);
-      print(prefs.getString("hchap " + widget.id));
+  recent() async {
+    preferences = await StreamingSharedPreferences.instance;
+    return Future.delayed(const Duration(seconds: 8), () async {
+      preferences.setString("hcap " + widget.id, "Chapter" + akhir2);
+      preferences.setString("hurl " + widget.id, widget.link);
+      preferences.setInt("hurut " + widget.id, widget.urut);
+      preferences.setString("hid " + widget.id, widget.id);
     });
   }
+
+  recentopen() async {}
 
   void fetchlink() async {
     String tempBaseUrl = widget.linkkomik.split(".my.id")[0] + ".my.id";
@@ -113,6 +118,7 @@ class _ReadState extends State<Read> {
     fetchInfo();
     fetchlink();
     recent();
+    recentopen();
   }
 
   @override
@@ -124,8 +130,11 @@ class _ReadState extends State<Read> {
         ? CupertinoPageScaffold(
             navigationBar: CupertinoNavigationBar(
               // Try removing opacity to observe the lack of a blur effect and of sliding content.
-              backgroundColor: Color.fromRGBO(228, 68, 238, 1),
-              middle: Text("Chapter" + akhir2),
+              backgroundColor: Const.baseColor,
+              middle: Text(
+                "Chapter" + akhir2,
+                style: TextStyle(color: Const.text3),
+              ),
             ),
             child: GestureDetector(
               onTap: () {
@@ -140,7 +149,7 @@ class _ReadState extends State<Read> {
                     builder: (context) {
                       return Container(
                         child: Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(8),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
@@ -229,27 +238,29 @@ class _ReadState extends State<Read> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                      icon: Icon(Icons.arrow_back),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
+                                  (widget.urut < linkch.length)
+                                      ? IconButton(
+                                          icon: Icon(Icons.arrow_back),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
 
-                                        Navigator.of(context).pushReplacement(
-                                            PageTransition(
-                                                type: PageTransitionType
-                                                    .bottomToTop,
-                                                child: Read(
-                                                  img: gbr,
-                                                  urut: widget.urut + 1,
-                                                  linkkomik: widget.linkkomik,
-                                                  link: linkch[widget.urut + 1]
-                                                      ['attributes']['href'],
-                                                  namakom: widget.namakom,
-                                                )));
-                                      }),
-                                  IconButton(
-                                      icon: Icon(Icons.play_arrow),
-                                      onPressed: () {}),
+                                            Navigator.of(context)
+                                                .pushReplacement(PageTransition(
+                                                    type: PageTransitionType
+                                                        .bottomToTop,
+                                                    child: Read(
+                                                      img: gbr,
+                                                      id: widget.id,
+                                                      urut: widget.urut + 1,
+                                                      linkkomik:
+                                                          widget.linkkomik,
+                                                      link: linkch[widget.urut +
+                                                              1]['attributes']
+                                                          ['href'],
+                                                      namakom: widget.namakom,
+                                                    )));
+                                          })
+                                      : SizedBox(),
                                   (widget.urut != 0)
                                       ? IconButton(
                                           icon: Icon(Icons.arrow_forward),
@@ -261,6 +272,7 @@ class _ReadState extends State<Read> {
                                                         .bottomToTop,
                                                     child: Read(
                                                       img: gbr,
+                                                      id: widget.id,
                                                       urut: widget.urut - 1,
                                                       linkkomik:
                                                           widget.linkkomik,
@@ -282,7 +294,7 @@ class _ReadState extends State<Read> {
                     });
               },
               child: Container(
-                color: Color.fromRGBO(34, 34, 34, 1),
+                color: Const.bgcolor,
                 width: double.infinity,
                 child: ListView(physics: BouncingScrollPhysics(), children: [
                   (url != blogger)
@@ -291,8 +303,7 @@ class _ReadState extends State<Read> {
                           children: [
                             for (var i = 0; i < panjang; i++)
                               Container(
-                                decoration: BoxDecoration(
-                                    color: Color.fromRGBO(34, 34, 34, 1)),
+                                decoration: BoxDecoration(color: Const.bgcolor),
                                 width: double.infinity,
                                 child: Center(
                                   child: CachedNetworkImage(
@@ -309,7 +320,7 @@ class _ReadState extends State<Read> {
                                           value: downloadProgress.progress,
                                           valueColor:
                                               new AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
+                                                  Const.text2),
                                         ),
                                       ),
                                     ),
@@ -346,13 +357,13 @@ class _ReadState extends State<Read> {
                                       decoration: BoxDecoration(
                                           color: Colors.transparent),
                                       width: double.infinity,
-                                      height: 200,
+                                      height: 250,
                                       child: Center(
                                         child: CircularProgressIndicator(
                                           value: downloadProgress.progress,
                                           valueColor:
                                               new AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
+                                                  Const.text2),
                                         ),
                                       ),
                                     ),
@@ -363,7 +374,10 @@ class _ReadState extends State<Read> {
                                       width: 120,
                                       height: 150,
                                       child: Center(
-                                        child: Icon(Icons.error),
+                                        child: Icon(
+                                          Icons.error,
+                                          color: Const.text2,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -379,19 +393,22 @@ class _ReadState extends State<Read> {
               Container(
                   width: double.infinity,
                   height: screensize.height,
-                  decoration:
-                      BoxDecoration(color: Color.fromRGBO(22, 21, 29, 1)),
+                  decoration: BoxDecoration(color: Const.bgcolor),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircularProgressIndicator(
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                              AlwaysStoppedAnimation<Color>(Const.text2),
                         ),
                         SizedBox(
                           height: 20,
                         ),
+                        Text(
+                          "Loading...",
+                          style: TextStyle(fontSize: 18, color: Const.text2),
+                        )
                       ],
                     ),
                   ))

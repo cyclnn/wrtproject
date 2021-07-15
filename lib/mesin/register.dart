@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:wrtproject/mesin/database.dart';
 import 'login.dart';
@@ -106,12 +106,8 @@ class Register extends StatelessWidget {
                         padding: const EdgeInsets.only(left: 100),
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.pop(
-                                context,
-                                PageTransition(
-                                    type: PageTransitionType.rightToLeft,
-                                    duration: Duration(seconds: 1),
-                                    child: LoginScreen()));
+                            Get.to(() => LoginScreen(),
+                                transition: Transition.leftToRight);
                           },
                           child: Text('Login',
                               style: TextStyle(

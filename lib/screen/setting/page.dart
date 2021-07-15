@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/about/contact.dart';
 import 'package:wrtproject/screen/about/dmca.dart';
 import 'package:wrtproject/screen/about/help.dart';
@@ -21,21 +22,22 @@ class _HalState extends State<Hal> {
     null,
     null,
     null,
+    null,
     Contact(),
     Dmca(),
     Dmca(),
+    Privacy(),
     Privacy(),
     Help()
   ];
 
   @override
   Widget build(BuildContext context) {
-    FlutterStatusbarcolor.setStatusBarColor(Color.fromRGBO(228, 68, 238, 1));
-    Size screensize = MediaQuery.of(context).size;
+    FlutterStatusbarcolor.setStatusBarColor(Const.baseColor);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(228, 68, 238, 1),
+        backgroundColor: Const.baseColor,
         title: Text(widget.jud),
       ),
       body: page[widget.ang],
