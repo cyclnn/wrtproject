@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Samsung 1",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5554"
+        },
+        {
+            "name": "Samsung 2",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5556"
+        },
+        {
+            "name": "Samsung A20",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "RR8M403GR5H"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "All devices",
+            "configurations": [
+                "Samsung 1",
+                "Samsung 2",
+                "Samsung A20"
+            ]
+        }
+    ]
+}

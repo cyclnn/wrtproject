@@ -1,6 +1,10 @@
 # WRT
 
+<<<<<<< HEAD
 Aplikasi komik World Romance Translation.
+=======
+A new Flutter project.
+>>>>>>> 422a828 (Version 2.0.0(Beta))
 
 ## Getting Started
 

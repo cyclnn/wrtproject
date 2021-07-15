@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:wrtproject/screen/detail.dart';
+import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/detailpage/detail.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class AllKom extends StatefulWidget {
   TabController controller;
@@ -56,7 +58,7 @@ class _AllKomState extends State<AllKom> {
   Widget build(BuildContext context) {
     return Container(
         decoration: BoxDecoration(
-          color: Color.fromRGBO(34, 34, 34, 1),
+          color: Const.bgcolor,
         ),
         width: double.infinity,
         child: SingleChildScrollView(
@@ -68,7 +70,7 @@ class _AllKomState extends State<AllKom> {
                 child: Text(
                   'SEMUA KOMIK (PAGE $num)',
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Const.text2, fontWeight: FontWeight.bold),
                 ),
               ),
               Divider(
@@ -88,7 +90,7 @@ class _AllKomState extends State<AllKom> {
                                     height: 10,
                                   ),
                                   Container(
-                                    width: 120,
+                                    width: 130,
                                     height: 150,
                                     child: Image.network(
                                       imgkomik[i]['attributes']['src'],
@@ -98,8 +100,8 @@ class _AllKomState extends State<AllKom> {
                                         if (loadingprogress == null)
                                           return child;
                                         return Container(
-                                          decoration:
-                                              BoxDecoration(color: Colors.grey),
+                                          decoration: BoxDecoration(
+                                              color: Const.cardcolor),
                                           width: 120,
                                           height: 150,
                                           child: Center(
@@ -120,7 +122,7 @@ class _AllKomState extends State<AllKom> {
                                     width: 120,
                                     child: Text(
                                       namakomik[i]['attributes']['title'],
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(color: Const.text2),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -133,7 +135,7 @@ class _AllKomState extends State<AllKom> {
                                     child: Text(
                                       chkomik[i]['title'].toString().trim(),
                                       style: TextStyle(
-                                          color: Colors.grey, fontSize: 12),
+                                          color: Const.textsm2, fontSize: 12),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
