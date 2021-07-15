@@ -37,11 +37,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-<<<<<<< HEAD
-=======
-apply plugin: 'com.google.firebase.firebase-perf'
-
->>>>>>> 422a828 (Version 2.0.0(Beta))
 
  def keystoreProperties = new Properties()
    def keystorePropertiesFile = rootProject.file('key.properties')
@@ -89,22 +84,15 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-<<<<<<< HEAD
-    implementation platform('com.google.firebase:firebase-bom:28.2.0')
-=======
     implementation platform('com.google.firebase:firebase-bom:28.2.1')
->>>>>>> 422a828 (Version 2.0.0(Beta))
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation "androidx.multidex:multidex:2.0.1"
     implementation 'com.google.android.material:material:1.4.0'
-<<<<<<< HEAD
-=======
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-perf'
 
 
->>>>>>> 422a828 (Version 2.0.0(Beta))
 
 
 
