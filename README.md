@@ -1,6 +1,6 @@
 # WRT
 
-Aplikasi Komik World ROmance Translation
+Aplikasi Komik World Romance Translation
 
 ## Getting Started
 
