@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 import '../../mesin/const.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,7 +13,6 @@ class Recent extends StatefulWidget {
 class _RecentState extends State<Recent> {
   int habib;
   bool loading = false;
-  static FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {

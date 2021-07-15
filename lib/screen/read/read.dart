@@ -8,7 +8,6 @@ import 'package:wrtproject/screen/komen/komen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:wrtproject/screen/lapor/lapor.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
-import 'package:hive/hive.dart';
 
 class Read extends StatefulWidget {
   final String link, linkkomik, namakom, linkdet, img, id;

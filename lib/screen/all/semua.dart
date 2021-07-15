@@ -3,7 +3,6 @@ import 'package:web_scraper/web_scraper.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/detailpage/detail.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 
 class AllKom extends StatefulWidget {
   TabController controller;

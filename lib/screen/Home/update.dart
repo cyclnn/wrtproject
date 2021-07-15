@@ -11,7 +11,7 @@ class UpdatePJ extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 8, right: 8),
+      padding: EdgeInsets.only(left: 5, right: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -40,7 +40,7 @@ class UpdatePJ extends StatelessWidget {
               imageUrl: komikImg,
               fit: BoxFit.fill,
               placeholder: (context, url) => Container(
-                width: Get.width / 3.5,
+                width: 120,
                 height: 150,
                 child: Center(
                   child: SizedBox(
@@ -125,7 +125,7 @@ class UpdatePJ2 extends StatelessWidget {
               ],
             ),
             width: 140,
-            height: 160,
+            height: 180,
             child: CachedNetworkImage(
               imageUrl: komikImg,
               fit: BoxFit.fill,
@@ -156,9 +156,9 @@ class UpdatePJ2 extends StatelessWidget {
               komikTitle,
               style: GoogleFonts.firaSans(
                   textStyle: TextStyle(
-                color: Const.text,
-                fontWeight: FontWeight.bold,
-              )),
+                      color: Const.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -170,7 +170,7 @@ class UpdatePJ2 extends StatelessWidget {
             width: 120,
             child: Text(
               "Chapter " + ch,
-              style: TextStyle(color: Const.textsm, fontSize: 12),
+              style: TextStyle(color: Const.textsm, fontSize: 14),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

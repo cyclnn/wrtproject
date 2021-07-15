@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wrtproject/mesin/cek_update.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/bloc/setting_bloc.dart';
 import 'package:wrtproject/wrapper.dart';
@@ -15,29 +16,45 @@ import 'package:get/get.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:hive/hive.dart';
+import 'mesin/global.dart' as globals;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-Future<void> main() async {
+Future<void> initPlatformState() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   var perm;
+
+  OneSignal.shared.setAppId("be7dac02-14fd-470f-bf7d-5ba24e08bdd2");
+
+  OneSignal.shared.setNotificationOpenedHandler((openedResult) {
+    var data = openedResult.notification.additionalData;
+
+    globals.appNavigator.currentState.push(MaterialPageRoute(
+        builder: (context) => Tes(
+              postId: data['post_id'],
+            )));
+  });
+  (prefs.getBool("notif") == null)
+      ? perm = false
+      : perm = prefs.getBool("notif");
+
+  OneSignal.shared.disablePush(perm);
+}
+
+Future<void> main() async {
+  globals.appNavigator = GlobalKey<NavigatorState>();
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('title');
   await Hive.openBox('gambar');
   await Hive.openBox('url');
   await Hive.openBox('idbookmark');
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+
   await Firebase.initializeApp();
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: await getTemporaryDirectory(),
   );
 
-  (prefs.getBool("notif") == null)
-      ? perm = false
-      : perm = prefs.getBool("notif");
-  OneSignal.shared.setAppId("be7dac02-14fd-470f-bf7d-5ba24e08bdd2");
-
-  OneSignal.shared.disablePush(perm);
   runApp(MyApp());
 }
 
@@ -49,6 +66,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String title = "habib";
   String content = "torang";
+
   @override
   void initState() {
     super.initState();

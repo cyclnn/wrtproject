@@ -345,7 +345,7 @@ class _DashState extends State<Dash> {
                                           GestureDetector(
                                             child: (constraints.maxWidth >
                                                         300 &&
-                                                    constraints.maxWidth < 600)
+                                                    constraints.maxWidth < 500)
                                                 ? UpdatePJ2(
                                                     komikImg: komiklist[i]
                                                         ['attributes']['src'],
@@ -354,10 +354,10 @@ class _DashState extends State<Dash> {
                                                     ch: chlist[i]['attributes']
                                                         ['title'],
                                                   )
-                                                : (constraints.maxWidth > 600 &&
+                                                : (constraints.maxWidth > 500 &&
                                                         constraints.maxWidth <
                                                             1000)
-                                                    ? UpdatePJ2(
+                                                    ? UpdatePJ(
                                                         komikImg: komiklist[i]
                                                                 ['attributes']
                                                             ['src'],
@@ -368,7 +368,7 @@ class _DashState extends State<Dash> {
                                                                 ['attributes']
                                                             ['title'],
                                                       )
-                                                    : UpdatePJ(
+                                                    : UpdatePJ2(
                                                         komikImg: komiklist[i]
                                                                 ['attributes']
                                                             ['src'],
@@ -486,7 +486,7 @@ class _DashState extends State<Dash> {
                                                                     300 &&
                                                                 constraints
                                                                         .maxWidth <
-                                                                    600)
+                                                                    500)
                                                             ? UpdatePJ2(
                                                                 komikImg:
                                                                     komiklist[i]
@@ -502,7 +502,7 @@ class _DashState extends State<Dash> {
                                                                     ['title'],
                                                               )
                                                             : (constraints.maxWidth >
-                                                                        600 &&
+                                                                        500 &&
                                                                     constraints
                                                                             .maxWidth <
                                                                         1000)
@@ -590,7 +590,7 @@ class _DashState extends State<Dash> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      "assets/img/lg.png",
+                      "assets/img/lg3.png",
                       height: 50,
                     ),
                     SizedBox(

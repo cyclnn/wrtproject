@@ -8,7 +8,7 @@ class AuthServices {
           email: email, password: password);
       User user = result.user;
       return user;
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       print('e.message');
     }
   }
