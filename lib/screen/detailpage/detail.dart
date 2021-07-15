@@ -159,18 +159,19 @@ class _DetailState extends State<Detail> {
   }
 
   void delbookmark() async {
-    var title = Hive.box('title');
+    var id = Hive.box('idbookmark');
 
-    for (var i = 0; i <= title.length; i++) {
-      if (title.getAt(i) == widget.nama) {
+    for (var i = 0; i <= id.length; i++) {
+      if (id.getAt(i) == idd) {
+        var title = Hive.box('title');
         title.deleteAt(i);
+
         var url = Hive.box('url');
         url.deleteAt(i); // index 0, key 0
 
         var gambar = Hive.box('gambar');
         gambar.deleteAt(i); // index 0, key 0
 
-        var id = Hive.box('idbookmark');
         id.deleteAt(i);
       }
     }
@@ -275,7 +276,9 @@ class _DetailState extends State<Detail> {
                                             ? GestureDetector(
                                                 onTap: () async {
                                                   bookmark();
-                                                  setState(() {});
+                                                  setState(() {
+                                                    cek.get(idd);
+                                                  });
                                                 },
                                                 child: AnimatedContainer(
                                                     height: 40,
@@ -304,7 +307,9 @@ class _DetailState extends State<Detail> {
                                             : GestureDetector(
                                                 onTap: () async {
                                                   delbookmark();
-                                                  setState(() {});
+                                                  setState(() {
+                                                    cek.get(idd);
+                                                  });
                                                 },
                                                 child: AnimatedContainer(
                                                     height: 40,

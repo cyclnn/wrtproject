@@ -38,6 +38,7 @@ class _BookmarkState extends State<Bookmark> {
     var title = Hive.box('title');
     var url = Hive.box('url');
     var gambar = Hive.box('gambar');
+    var id = Hive.box('idbookmark');
     Size screensize = MediaQuery.of(context).size;
     return (load)
         ? Scaffold(
@@ -52,7 +53,6 @@ class _BookmarkState extends State<Bookmark> {
                         decoration: BoxDecoration(
                           color: Const.bgcolor,
                         ),
-                        width: Get.width,
                         height: screensize.height,
                         child: SingleChildScrollView(
                           child: Column(
@@ -181,9 +181,10 @@ class _BookmarkState extends State<Bookmark> {
                                                   title.getAt(i),
                                                   style: GoogleFonts.firaSans(
                                                       textStyle: TextStyle(
-                                                    color: Const.text,
-                                                    fontWeight: FontWeight.bold,
-                                                  )),
+                                                          color: Const.text,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18)),
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -199,6 +200,7 @@ class _BookmarkState extends State<Bookmark> {
                                           title.deleteAt(i);
                                           gambar.deleteAt(i);
                                           url.deleteAt(i);
+                                          id.deleteAt(i);
                                           setState(() {
                                             getA();
                                           });

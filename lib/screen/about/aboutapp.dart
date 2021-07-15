@@ -24,8 +24,6 @@ class AboutApp extends StatelessWidget {
   <li>Load gambar Chapter secara bersamaan</li>
   <li>Chatango</li>
 </ul>
-<<<<<<< HEAD
-=======
 <h4>Versi 1.0.1 (Beta)</h4>
 <ul>
   <li>Fix warna teks tertimpa background</li>
@@ -43,7 +41,6 @@ class AboutApp extends StatelessWidget {
   <li>Perbaikan fungsi search</li>
   <li>Perbaikan page Komentar (Sebelumnya tidak bisa login disqus)</li>
 </ul>
->>>>>>> 422a828 (Version 2.0.0(Beta))
 
 '''),
         ),

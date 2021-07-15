@@ -343,8 +343,10 @@ class _DashState extends State<Dash> {
                                       Column(
                                         children: [
                                           GestureDetector(
-                                            child: (constraints.maxWidth > 600)
-                                                ? UpdatePJ(
+                                            child: (constraints.maxWidth >
+                                                        300 &&
+                                                    constraints.maxWidth < 600)
+                                                ? UpdatePJ2(
                                                     komikImg: komiklist[i]
                                                         ['attributes']['src'],
                                                     komikTitle: namalist[i]
@@ -352,8 +354,10 @@ class _DashState extends State<Dash> {
                                                     ch: chlist[i]['attributes']
                                                         ['title'],
                                                   )
-                                                : (constraints.maxWidth > 800)
-                                                    ? UpdatePJ(
+                                                : (constraints.maxWidth > 600 &&
+                                                        constraints.maxWidth <
+                                                            1000)
+                                                    ? UpdatePJ2(
                                                         komikImg: komiklist[i]
                                                                 ['attributes']
                                                             ['src'],
@@ -364,7 +368,7 @@ class _DashState extends State<Dash> {
                                                                 ['attributes']
                                                             ['title'],
                                                       )
-                                                    : UpdatePJ2(
+                                                    : UpdatePJ(
                                                         komikImg: komiklist[i]
                                                                 ['attributes']
                                                             ['src'],
@@ -467,51 +471,105 @@ class _DashState extends State<Dash> {
                                                 ),
                                               );
                                             else
-                                              return Wrap(
-                                                children: [
-                                                  for (var i = 15; i < 39; i++)
-                                                    GestureDetector(
-                                                      child: UpdatePJ(
-                                                        komikImg: komiklist[i]
-                                                                ['attributes']
-                                                            ['src'],
-                                                        komikTitle: namalist[i]
-                                                                ['attributes']
-                                                            ['title'],
-                                                        ch: chlist[i]
-                                                                ['attributes']
-                                                            ['title'],
-                                                      ),
-                                                      onTap: () {
-                                                        Get.to(
-                                                            () => Detail(
-                                                                lnk: linkup[i][
+                                              return LayoutBuilder(
+                                                builder: (BuildContext context,
+                                                        BoxConstraints
+                                                            constraints) =>
+                                                    Wrap(
+                                                  children: [
+                                                    for (var i = 15;
+                                                        i < 39;
+                                                        i++)
+                                                      GestureDetector(
+                                                        child: (constraints
+                                                                        .maxWidth >
+                                                                    300 &&
+                                                                constraints
+                                                                        .maxWidth <
+                                                                    600)
+                                                            ? UpdatePJ2(
+                                                                komikImg:
+                                                                    komiklist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        ['src'],
+                                                                komikTitle: namalist[
+                                                                            i][
                                                                         'attributes']
-                                                                    ['href'],
-                                                                gambar: komiklist[
-                                                                            i]
-                                                                        ['attributes']
-                                                                    ['src'],
-                                                                nama: namalist[i]
-                                                                        ['attributes']
-                                                                    ['title']),
-                                                            transition:
-                                                                Transition
-                                                                    .downToUp);
-                                                        History.createOrupdate(
-                                                            1,
-                                                            nama: namalist[i][
-                                                                    'attributes']
-                                                                ['title'],
-                                                            img: komiklist[i][
-                                                                    'attributes']
-                                                                ['src'],
-                                                            link: linkup[i][
-                                                                    'attributes']
-                                                                ['href']);
-                                                      },
-                                                    )
-                                                ],
+                                                                    ['title'],
+                                                                ch: chlist[i][
+                                                                        'attributes']
+                                                                    ['title'],
+                                                              )
+                                                            : (constraints.maxWidth >
+                                                                        600 &&
+                                                                    constraints
+                                                                            .maxWidth <
+                                                                        1000)
+                                                                ? UpdatePJ(
+                                                                    komikImg: komiklist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        ['src'],
+                                                                    komikTitle: namalist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        [
+                                                                        'title'],
+                                                                    ch: chlist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        [
+                                                                        'title'],
+                                                                  )
+                                                                : UpdatePJ2(
+                                                                    komikImg: komiklist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        ['src'],
+                                                                    komikTitle: namalist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        [
+                                                                        'title'],
+                                                                    ch: chlist[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        [
+                                                                        'title'],
+                                                                  ),
+                                                        onTap: () {
+                                                          Get.to(
+                                                              () => Detail(
+                                                                  lnk: linkup[i]
+                                                                          ['attributes']
+                                                                      ['href'],
+                                                                  gambar: komiklist[i]
+                                                                          ['attributes']
+                                                                      ['src'],
+                                                                  nama: namalist[
+                                                                              i]
+                                                                          ['attributes']
+                                                                      [
+                                                                      'title']),
+                                                              transition:
+                                                                  Transition
+                                                                      .downToUp);
+                                                          History.createOrupdate(
+                                                              1,
+                                                              nama: namalist[i][
+                                                                      'attributes']
+                                                                  ['title'],
+                                                              img: komiklist[i][
+                                                                      'attributes']
+                                                                  ['src'],
+                                                              link: linkup[i][
+                                                                      'attributes']
+                                                                  ['href']);
+                                                        },
+                                                      )
+                                                  ],
+                                                ),
                                               );
                                           },
                                         ),
