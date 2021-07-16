@@ -43,7 +43,6 @@ class _DetgenState extends State<Detgen> {
 
       setState(() {
         komikLoad = true;
-        print(tempRoute);
       });
     }
   }

@@ -27,7 +27,6 @@ class _GenlistState extends State<Genlist> {
 
       setState(() {
         komikLoad = true;
-        print(linkgenre[1]['attributes']['href']);
       });
     }
   }

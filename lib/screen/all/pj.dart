@@ -45,7 +45,6 @@ class _AllPjState extends State<AllPj> {
 
       setState(() {
         komikLoad = true;
-        print(hot[2]['attributes']['class']);
       });
     }
   }

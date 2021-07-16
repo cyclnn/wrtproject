@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wrtproject/mesin/cek_update.dart';
 import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/bloc/modebaca_bloc.dart';
 import 'package:wrtproject/screen/bloc/setting_bloc.dart';
 import 'package:wrtproject/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,11 +20,14 @@ import 'package:hive/hive.dart';
 import 'mesin/global.dart' as globals;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 Future<void> initPlatformState() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var perm;
-
+  if (prefs.getInt("readmode") == null) {
+    prefs.setInt("readmode", 1);
+  }
   OneSignal.shared.setAppId("be7dac02-14fd-470f-bf7d-5ba24e08bdd2");
 
   OneSignal.shared.setNotificationOpenedHandler((openedResult) {
@@ -71,6 +75,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     main();
+    initPlatformState();
   }
 
   @override
@@ -89,6 +94,15 @@ class _MyAppState extends State<MyApp> {
                   ),
                   BlocProvider<ColorBloc2>(
                     create: (_) => ColorBloc2(),
+                  ),
+                  BlocProvider<ModeBloc>(
+                    create: (_) => ModeBloc(),
+                  ),
+                  BlocProvider<ModeBloc2>(
+                    create: (_) => ModeBloc2(),
+                  ),
+                  BlocProvider<ModeBloc3>(
+                    create: (_) => ModeBloc3(),
                   )
                 ],
                 child: GetMaterialApp(

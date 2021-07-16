@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:wrtproject/mesin/register.dart';
 import 'package:wrtproject/screen/Home/home.dart';
 import 'package:get/get.dart';
+import 'package:wrtproject/wrapper.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _email = TextEditingController();
@@ -12,7 +14,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirebaseAuth auth = FirebaseAuth.instance;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Padding(
@@ -97,6 +98,33 @@ class LoginScreen extends StatelessWidget {
             ),
             SizedBox(
               height: 20,
+            ),
+            Center(
+              child: SizedBox(
+                  width: 400,
+                  height: 50,
+                  child: Container(
+                    color: Colors.redAccent,
+                    child: new TextButton.icon(
+                        onPressed: () {
+                          Alert(
+                                  context: context,
+                                  title: "Ooopss",
+                                  desc: "Metode Login Ini Sedang Dikerjakan")
+                              .show();
+                        },
+                        icon: Icon(
+                          MdiIcons.google,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          "Login Google",
+                          style: TextStyle(color: Colors.white),
+                        )),
+                  )),
+            ),
+            SizedBox(
+              height: 40,
             ),
             Row(
               children: [
