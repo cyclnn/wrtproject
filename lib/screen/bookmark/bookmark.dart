@@ -21,7 +21,6 @@ class _BookmarkState extends State<Bookmark> {
     await Hive.openBox('url');
     var box = Hive.box('title');
     legt = box.length;
-    print(legt);
     setState(() {
       load = true;
     });
@@ -215,7 +214,6 @@ class _BookmarkState extends State<Bookmark> {
                                               transition: Transition.downToUp);
                                         },
                                         onDoubleTap: () {
-                                          print(i);
                                         },
                                       ),
                                   ],

@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/mesin/modebaca.dart';
 import 'package:wrtproject/screen/detailpage/chapter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/screen/komen/komen.dart';
@@ -13,6 +15,8 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
+import 'package:wrtproject/screen/read/simpel.dart';
+import '../read/webview.dart';
 
 class Detail extends StatefulWidget {
   final String lnk, nama, gambar;
@@ -52,6 +56,7 @@ class _DetailState extends State<Detail> {
   Preference hid;
   Preference hurut;
   var preferences;
+  var moderead;
 
   double _sigmaX = 10; // from 0-10
   double _sigmaY = 10; // from 0-10
@@ -139,7 +144,6 @@ class _DetailState extends State<Detail> {
         }
         load = true;
         get();
-        print(id[0]['attributes']['id']);
       });
     }
   }
@@ -177,6 +181,12 @@ class _DetailState extends State<Detail> {
     }
   }
 
+  void cekRead() async {
+    SharedPreferences mode = await SharedPreferences.getInstance();
+    moderead = mode.getInt("readmode");
+    return moderead;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -185,6 +195,7 @@ class _DetailState extends State<Detail> {
     setState(() {
       fetchInfo();
     });
+    cekRead();
   }
 
   @override
@@ -776,28 +787,54 @@ class _DetailState extends State<Detail> {
                                                               ['title']),
                                                       onTap: () {
                                                         Get.to(
-                                                            () => Read(
-                                                                  link: linkch[
-                                                                              i]
-                                                                          [
-                                                                          'attributes']
-                                                                      ['href'],
-                                                                  linkkomik:
-                                                                      widget
-                                                                          .lnk,
-                                                                  urut: i,
-                                                                  id: id[0][
-                                                                          'attributes']
-                                                                      ['id'],
-                                                                  linkdet:
-                                                                      widget
-                                                                          .lnk,
-                                                                  namakom:
-                                                                      widget
-                                                                          .nama,
-                                                                  img: widget
-                                                                      .gambar,
-                                                                ),
+                                                            () => (moderead ==
+                                                                    1)
+                                                                ? Read(
+                                                                    link: linkch[i]
+                                                                            [
+                                                                            'attributes']
+                                                                        [
+                                                                        'href'],
+                                                                    linkkomik:
+                                                                        widget
+                                                                            .lnk,
+                                                                    urut: i,
+                                                                    id: id[0][
+                                                                            'attributes']
+                                                                        ['id'],
+                                                                    linkdet:
+                                                                        widget
+                                                                            .lnk,
+                                                                    namakom:
+                                                                        widget
+                                                                            .nama,
+                                                                    img: widget
+                                                                        .gambar,
+                                                                  )
+                                                                : (moderead ==
+                                                                        2)
+                                                                    ? WebView(
+                                                                        lnk: linkch[i]['attributes']
+                                                                            [
+                                                                            'href'],
+                                                                      )
+                                                                    : Mode3(
+                                                                        link: linkch[i]['attributes']
+                                                                            [
+                                                                            'href'],
+                                                                        linkkomik:
+                                                                            widget.lnk,
+                                                                        urut: i,
+                                                                        id: id[0]['attributes']
+                                                                            [
+                                                                            'id'],
+                                                                        linkdet:
+                                                                            widget.lnk,
+                                                                        namakom:
+                                                                            widget.nama,
+                                                                        img: widget
+                                                                            .gambar,
+                                                                      ),
                                                             transition:
                                                                 Transition
                                                                     .zoom);

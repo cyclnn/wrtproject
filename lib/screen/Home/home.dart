@@ -21,6 +21,8 @@ class _HomeState extends State<Home> {
     });
   }
 
+  
+
   final List<Widget> tab = [Dash(), Semua(), Genlist(), Bookmark(), Setting()];
 
   @override

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/mesin/database.dart';
 import 'package:wrtproject/mesin/login.dart';
 import 'package:wrtproject/mesin/auth.dart';
+import 'package:wrtproject/mesin/modebaca.dart';
+import 'package:wrtproject/mesin/sync_history.dart';
 import 'package:wrtproject/screen/Home/home.dart';
+import 'package:wrtproject/screen/bloc/modebaca_bloc.dart';
+import 'package:wrtproject/screen/setting/modal.dart';
 import '../bloc/setting_bloc.dart';
 import 'page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Setting extends StatefulWidget {
   @override
@@ -35,7 +41,6 @@ class _SettingState extends State<Setting> {
 
   final List<String> titl = <String>[
     'About App',
-    'Notifikasi',
     'Donasi',
     'Facebook',
     'Discord',
@@ -57,13 +62,38 @@ class _SettingState extends State<Setting> {
   void notif() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     notifi = prefs.getBool("notif");
-    print(notifi);
+  }
+
+  void tes() async {
+    var cek;
+    SharedPreferences mode = await SharedPreferences.getInstance();
+    ModeBloc bloc3 = BlocProvider.of<ModeBloc>(context);
+    ModeBloc2 bloc4 = BlocProvider.of<ModeBloc2>(context);
+    ModeBloc3 bloc5 = BlocProvider.of<ModeBloc3>(context);
+    cek = mode.getInt("readmode");
+    if (cek == 1) {
+      bloc3.add(ColorEvent3.to_transparent);
+      bloc4.add(ColorEvent4.to_pink);
+      bloc5.add(ColorEvent5.to_transparent);
+      setState(() {});
+    } else if (cek == 2) {
+      bloc3.add(ColorEvent3.to_pink);
+      bloc4.add(ColorEvent4.to_transparent);
+      bloc5.add(ColorEvent5.to_transparent);
+      setState(() {});
+    } else if (cek == null) {
+      bloc4.add(ColorEvent4.to_transparent);
+      bloc3.add(ColorEvent3.to_pink);
+      bloc5.add(ColorEvent5.to_pink);
+      setState(() {});
+    }
   }
 
   @override
   void initState() {
     super.initState();
     notif();
+    tes();
   }
 
   @override
@@ -72,6 +102,9 @@ class _SettingState extends State<Setting> {
     Size screensize = MediaQuery.of(context).size;
     ColorBloc bloc = BlocProvider.of<ColorBloc>(context);
     ColorBloc2 bloc2 = BlocProvider.of<ColorBloc2>(context);
+    ModeBloc bloc3 = BlocProvider.of<ModeBloc>(context);
+    ModeBloc2 bloc4 = BlocProvider.of<ModeBloc2>(context);
+    ModeBloc3 bloc5 = BlocProvider.of<ModeBloc3>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -194,33 +227,171 @@ class _SettingState extends State<Setting> {
                   height: 8,
                 ),
                 Text(
-                  "Info",
+                  "Pengaturan",
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
                 Divider(
                   color: Colors.grey,
                 ),
-                for (var i = 0; i < titl.length; i++)
-                  Padding(
-                      padding: EdgeInsets.only(left: 8),
-                      child: InkWell(
-                        onTap: () async {
-                          if ((i == 2) || (i == 3) || (i == 4)) {
-                            await launch(url[i]);
-                          } else if (i == 1) {
-                            showModalBottomSheet(
-                                context: context,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(25),
-                                  ),
+                Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(25),
+                              ),
+                            ),
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            builder: (context) {
+                              return BlocBuilder<ColorBloc, Color>(
+                                builder: (_, color) {
+                                  return BlocBuilder<ColorBloc2, Color>(
+                                    builder: (_, warna) {
+                                      return Container(
+                                          color: Colors.black,
+                                          child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.notifications,
+                                                            color: Colors.white,
+                                                          ),
+                                                          Text(
+                                                            "Pengaturan Notifikasi",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Divider(
+                                                      height: 15,
+                                                      color: Colors.white,
+                                                    ),
+                                                    GestureDetector(
+                                                      child: AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 300),
+                                                        width: double.infinity,
+                                                        color: warna,
+                                                        height: 30,
+                                                        margin:
+                                                            EdgeInsets.all(5),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "Hidup",
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        bloc.add(ColorEvent
+                                                            .to_transparent);
+                                                        bloc2.add(ColorEvent2
+                                                            .to_pink);
+                                                        recent(false);
+                                                      },
+                                                    ),
+                                                    GestureDetector(
+                                                      child: AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 530),
+                                                        width: double.infinity,
+                                                        color: color,
+                                                        height: 30,
+                                                        margin:
+                                                            EdgeInsets.all(5),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "Mati",
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        bloc.add(
+                                                            ColorEvent.to_pink);
+                                                        bloc2.add(ColorEvent2
+                                                            .to_transparent);
+                                                        recent(true);
+                                                      },
+                                                    ),
+                                                  ])));
+                                    },
+                                  );
+                                },
+                              );
+                            });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.grey, width: 0.3))),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(MdiIcons.bellAlert),
+                                SizedBox(
+                                  width: 10,
                                 ),
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                                builder: (context) {
-                                  return BlocBuilder<ColorBloc, Color>(
-                                    builder: (_, color) {
-                                      return BlocBuilder<ColorBloc2, Color>(
-                                        builder: (_, warna) {
+                                Text(
+                                  "Notifikasi",
+                                  style: TextStyle(
+                                      color: Const.text, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(25),
+                              ),
+                            ),
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            builder: (context) {
+                              return BlocBuilder<ModeBloc, Color>(
+                                builder: (_, color) {
+                                  return BlocBuilder<ModeBloc2, Color>(
+                                    builder: (_, warna) {
+                                      return BlocBuilder<ModeBloc3, Color>(
+                                        builder: (context, warna2) {
                                           return Container(
                                               color: Colors.black,
                                               child: Padding(
@@ -240,13 +411,12 @@ class _SettingState extends State<Setting> {
                                                                     .start,
                                                             children: [
                                                               Icon(
-                                                                Icons
-                                                                    .notifications,
+                                                                Icons.book,
                                                                 color: Colors
                                                                     .white,
                                                               ),
                                                               Text(
-                                                                "Pengaturan Notifikasi",
+                                                                "Mode Halaman Baca",
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .white),
@@ -273,7 +443,7 @@ class _SettingState extends State<Setting> {
                                                                     5),
                                                             child: Center(
                                                               child: Text(
-                                                                "Hidup",
+                                                                "Native (Default)",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         16,
@@ -283,13 +453,14 @@ class _SettingState extends State<Setting> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            bloc.add(ColorEvent
+                                                            bloc3.add(ColorEvent3
                                                                 .to_transparent);
-                                                            bloc2.add(
-                                                                ColorEvent2
+                                                            bloc4.add(
+                                                                ColorEvent4
                                                                     .to_pink);
-                                                            recent(false);
-                                                            print(notifi);
+                                                            bloc5.add(ColorEvent5
+                                                                .to_transparent);
+                                                            changeReadMode(1);
                                                           },
                                                         ),
                                                         GestureDetector(
@@ -307,7 +478,7 @@ class _SettingState extends State<Setting> {
                                                                     5),
                                                             child: Center(
                                                               child: Text(
-                                                                "Mati",
+                                                                "Webview",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         16,
@@ -317,12 +488,49 @@ class _SettingState extends State<Setting> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            bloc.add(ColorEvent
-                                                                .to_pink);
-                                                            bloc2.add(ColorEvent2
+                                                            bloc3.add(
+                                                                ColorEvent3
+                                                                    .to_pink);
+                                                            bloc4.add(ColorEvent4
                                                                 .to_transparent);
-                                                            recent(true);
-                                                            print(notifi);
+                                                            bloc5.add(ColorEvent5
+                                                                .to_transparent);
+                                                            changeReadMode(2);
+                                                          },
+                                                        ),
+                                                        GestureDetector(
+                                                          child:
+                                                              AnimatedContainer(
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    530),
+                                                            width:
+                                                                double.infinity,
+                                                            color: warna2,
+                                                            height: 30,
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    5),
+                                                            child: Center(
+                                                              child: Text(
+                                                                "Simpel",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            bloc3.add(ColorEvent3
+                                                                .to_transparent);
+                                                            bloc4.add(ColorEvent4
+                                                                .to_transparent);
+                                                            bloc5.add(
+                                                                ColorEvent5
+                                                                    .to_pink);
+                                                            changeReadMode(3);
                                                           },
                                                         ),
                                                       ])));
@@ -330,7 +538,300 @@ class _SettingState extends State<Setting> {
                                       );
                                     },
                                   );
-                                });
+                                },
+                              );
+                            });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.grey, width: 0.3))),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(MdiIcons.bookEdit),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Mode Baca",
+                                  style: TextStyle(
+                                      color: Const.text, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: InkWell(
+                      onTap: () {
+                        var tek =
+                            "Fungsi ini akan mencadangkan data bookmark di device anda ke akun yang anda daftarkan, pastikan koneksi anda lancar untuk menghindari error";
+                        Alert(
+                          context: context,
+                          type: AlertType.warning,
+                          title: "Peringatan",
+                          desc: tek,
+                          buttons: [
+                            DialogButton(
+                              child: Text(
+                                "Oke Siap",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () {
+                                Syncron.addHistory()
+                                    .then((value) => Navigator.pop(context))
+                                    .then((value) => Alert(
+                                          context: context,
+                                          type: AlertType.success,
+                                          title: "Upload Data Berhasil",
+                                          buttons: [
+                                            DialogButton(
+                                              child: Text(
+                                                "Oke",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20),
+                                              ),
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              width: 120,
+                                            )
+                                          ],
+                                        ).show());
+                              },
+                              color: Color.fromRGBO(0, 179, 134, 1.0),
+                            ),
+                            DialogButton(
+                              child: Text(
+                                "Sabar Dulu",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              gradient: LinearGradient(colors: [
+                                Color.fromRGBO(116, 116, 191, 1.0),
+                                Color.fromRGBO(52, 138, 199, 1.0)
+                              ]),
+                            )
+                          ],
+                        ).show();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.grey, width: 0.3))),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(MdiIcons.syncIcon),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Sinkron Data",
+                                  style: TextStyle(
+                                      color: Const.text, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: InkWell(
+                      onTap: () {
+                        var tek =
+                            "Fungsi ini akan mengambil data cadangan dari akun anda ke device ini, pastikan koneksi anda lancar untuk menghindari error";
+                        Alert(
+                          context: context,
+                          type: AlertType.warning,
+                          title: "Peringatan",
+                          desc: tek,
+                          buttons: [
+                            DialogButton(
+                              child: Text(
+                                "Oke Siap",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () {
+                                Syncron.restoreHistory()
+                                    .then((value) => tes())
+                                    .then((value) => Navigator.pop(context))
+                                    .then((value) => Alert(
+                                          context: context,
+                                          type: AlertType.success,
+                                          title: "Restore Data Berhasil",
+                                          buttons: [
+                                            DialogButton(
+                                              child: Text(
+                                                "Oke",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20),
+                                              ),
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              width: 120,
+                                            )
+                                          ],
+                                        ).show());
+                              },
+                              color: Color.fromRGBO(0, 179, 134, 1.0),
+                            ),
+                            DialogButton(
+                              child: Text(
+                                "Sabar Dulu",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              gradient: LinearGradient(colors: [
+                                Color.fromRGBO(116, 116, 191, 1.0),
+                                Color.fromRGBO(52, 138, 199, 1.0)
+                              ]),
+                            )
+                          ],
+                        ).show();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.grey, width: 0.3))),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(MdiIcons.download),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Restore Data",
+                                  style: TextStyle(
+                                      color: Const.text, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: InkWell(
+                      onTap: () async {
+                        await DefaultCacheManager().emptyCache();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.grey, width: 0.3))),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(MdiIcons.trashCan),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Clear Cache",
+                                  style: TextStyle(
+                                      color: Const.text, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                if (auth.currentUser != null)
+                  Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: InkWell(
+                        onTap: () {
+                          AuthServices.signOut().then((value) =>
+                              Navigator.pushReplacement(
+                                  context,
+                                  PageTransition(
+                                      type: PageTransitionType.leftToRight,
+                                      child: Home())));
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.grey, width: 0.3))),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(MdiIcons.logout),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                        color: Const.text, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  "Info",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                Divider(
+                  color: Colors.grey,
+                ),
+                for (var i = 0; i < titl.length; i++)
+                  Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: InkWell(
+                        onTap: () async {
+                          if ((i == 1) || (i == 2) || (i == 3)) {
+                            await launch(url[i]);
                           } else {
                             Navigator.push(
                                 context,
@@ -361,90 +862,11 @@ class _SettingState extends State<Setting> {
                           ),
                         ),
                       )),
-                Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: InkWell(
-                      onTap: () async {
-                        await DefaultCacheManager().emptyCache();
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    color: Colors.grey, width: 0.3))),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Clear Cache",
-                              style: TextStyle(color: Const.text, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )),
-                if (auth.currentUser != null)
-                  Padding(
-                      padding: EdgeInsets.only(left: 8),
-                      child: InkWell(
-                        onTap: () {
-                          AuthServices.signOut().then((value) =>
-                              Navigator.pushReplacement(
-                                  context,
-                                  PageTransition(
-                                      type: PageTransitionType.leftToRight,
-                                      child: Home())));
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.grey, width: 0.3))),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Log Out",
-                                style:
-                                    TextStyle(color: Const.text, fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )),
               ],
             ),
           ),
         ),
       ),
     );
-  }
-}
-
-class AppState with ChangeNotifier {
-  bool iisBlue = true;
-  bool iisBlue2 = false;
-  String tul;
-  bool get isBlue => iisBlue;
-  bool get isBlue2 => iisBlue2;
-  set isBlue(bool value) {
-    iisBlue = value;
-    notifyListeners();
-  }
-
-  Color get color => (iisBlue) ? Colors.pinkAccent : Colors.transparent;
-  Color get warna => (iisBlue2) ? Colors.pinkAccent : Colors.transparent;
-  String get tex {
-    if (iisBlue) {
-      return tul = "Hidup";
-    } else {
-      return tul = "Mati";
-    }
   }
 }

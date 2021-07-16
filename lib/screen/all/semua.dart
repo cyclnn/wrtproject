@@ -42,7 +42,6 @@ class _AllKomState extends State<AllKom> {
 
       setState(() {
         komikLoad = true;
-        print(imgkomik);
       });
     }
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:flutter/widgets.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/komen/komen.dart';
@@ -10,10 +10,10 @@ import 'package:wrtproject/screen/lapor/lapor.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class Read extends StatefulWidget {
+class Mode3 extends StatefulWidget {
   final String link, linkkomik, namakom, linkdet, img, id;
   final int urut;
-  const Read(
+  const Mode3(
       {Key key,
       this.link,
       this.id,
@@ -24,10 +24,10 @@ class Read extends StatefulWidget {
       this.img})
       : super(key: key);
   @override
-  _ReadState createState() => _ReadState();
+  _Mode3State createState() => _Mode3State();
 }
 
-class _ReadState extends State<Read> {
+class _Mode3State extends State<Mode3> {
   List<Map<String, dynamic>> core;
   List<Map<String, dynamic>> habib;
   List<Map<String, dynamic>> prev;
@@ -50,11 +50,7 @@ class _ReadState extends State<Read> {
 
     final scraper = WebScraper(tempBaseUrl);
     if (await scraper.loadWebPage(tempRoute)) {
-      core = scraper.getElement("div.habib > #readerarea > img", ['src']);
-      habib = scraper.getElement("div.habib > p > img", ['src']);
-      imgbox = scraper.getElement("div.habib > p > a > img", ['src']);
-      kc = scraper.getElement("div.habib > div > img", ['src']);
-      blogger = scraper.getElement("div.habib > div.separator > a", ['href']);
+      core = scraper.getElement("#readerarea", []);
       komen = scraper.getElement("div.torang > a", ['href']);
       prev = scraper.getElement(
           "span.navlef > span.npv > div.nextprev > a.ch-prev-btn", ['href']);
@@ -65,22 +61,6 @@ class _ReadState extends State<Read> {
       akhir3 = akhir.split("Bahasa")[0];
 
       setState(() {
-        if (blogger.length > 1) {
-          panjang = blogger.length;
-          url = blogger;
-        } else if (core.length > 1) {
-          panjang = core.length;
-          url = core;
-        } else if (habib.length > 1) {
-          panjang = habib.length;
-          url = habib;
-        } else if (imgbox.length > 1) {
-          panjang = imgbox.length;
-          url = imgbox;
-        } else if (kc.length > 1) {
-          panjang = kc.length;
-          url = kc;
-        }
         akhir3 = akhir.split("Bahasa")[0];
         load = 1;
       });
@@ -252,7 +232,7 @@ class _ReadState extends State<Read> {
                                                 .pushReplacement(PageTransition(
                                                     type: PageTransitionType
                                                         .bottomToTop,
-                                                    child: Read(
+                                                    child: Mode3(
                                                       img: gbr,
                                                       id: widget.id,
                                                       urut: widget.urut + 1,
@@ -274,7 +254,7 @@ class _ReadState extends State<Read> {
                                                 .pushReplacement(PageTransition(
                                                     type: PageTransitionType
                                                         .bottomToTop,
-                                                    child: Read(
+                                                    child: Mode3(
                                                       img: gbr,
                                                       id: widget.id,
                                                       urut: widget.urut - 1,
@@ -300,128 +280,28 @@ class _ReadState extends State<Read> {
               child: Container(
                 color: Const.bgcolor,
                 width: double.infinity,
-                child: SmartRefresher(
-                  controller: _refreshController,
-                  enablePullDown: true,
-                  onRefresh: _onRefresh,
-                  child: ListView.builder(
-                      itemCount: panjang,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (context, k) => (url != blogger)
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  decoration:
-                                      BoxDecoration(color: Const.bgcolor),
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: CachedNetworkImage(
-                                      imageUrl: url[k]['attributes']['src'],
-                                      progressIndicatorBuilder:
-                                          (context, url, downloadProgress) =>
-                                              Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: double.infinity,
-                                        height: 200,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value: downloadProgress.progress,
-                                            valueColor:
-                                                new AlwaysStoppedAnimation<
-                                                    Color>(Const.text2),
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: 120,
-                                        height: 150,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.error,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: CachedNetworkImage(
-                                      imageUrl: url[k]['attributes']['href'],
-                                      progressIndicatorBuilder:
-                                          (context, url, downloadProgress) =>
-                                              Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: double.infinity,
-                                        height: 250,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value: downloadProgress.progress,
-                                            valueColor:
-                                                new AlwaysStoppedAnimation<
-                                                    Color>(Const.text2),
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: 120,
-                                        height: 150,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.error,
-                                            color: Const.text2,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                ),
+                child: ListView(physics: BouncingScrollPhysics(), children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(color: Const.bgcolor),
+                        width: double.infinity,
+                        child: Center(child: HtmlWidget(core[0]['title'])),
+                      ),
+                    ],
+                  )
+                ]),
               ),
             ))
-        : Stack(
-            children: [
-              Container(
-                  width: double.infinity,
-                  height: screensize.height,
-                  decoration: BoxDecoration(color: Const.bgcolor),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Const.text2),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          "Loading...",
-                          style: TextStyle(fontSize: 18, color: Const.text2),
-                        )
-                      ],
-                    ),
-                  ))
-            ],
+        : Container(
+            color: Const.bgcolor,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.deepPurple,
+                strokeWidth: 2,
+              ),
+            ),
           );
   }
 }

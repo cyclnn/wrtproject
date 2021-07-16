@@ -158,7 +158,7 @@ class UpdatePJ2 extends StatelessWidget {
                   textStyle: TextStyle(
                       color: Const.text,
                       fontWeight: FontWeight.bold,
-                      fontSize: 17)),
+                      fontSize: 14)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -170,7 +170,7 @@ class UpdatePJ2 extends StatelessWidget {
             width: 120,
             child: Text(
               "Chapter " + ch,
-              style: TextStyle(color: Const.textsm, fontSize: 14),
+              style: TextStyle(color: Const.textsm, fontSize: 12),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
