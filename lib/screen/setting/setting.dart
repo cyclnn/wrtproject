@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/mesin/const.dart';
-import 'package:wrtproject/mesin/database.dart';
-import 'package:wrtproject/mesin/login.dart';
 import 'package:wrtproject/mesin/auth.dart';
 import 'package:wrtproject/mesin/modebaca.dart';
 import 'package:wrtproject/mesin/sync_history.dart';
-import 'package:wrtproject/screen/Home/home.dart';
 import 'package:wrtproject/screen/bloc/modebaca_bloc.dart';
-import 'package:wrtproject/screen/setting/modal.dart';
+import 'package:wrtproject/screen/setting/akun_info.dart';
 import '../bloc/setting_bloc.dart';
+import 'package:get/get.dart';
 import 'page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,6 +16,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Setting extends StatefulWidget {
   @override
@@ -26,11 +25,11 @@ class Setting extends StatefulWidget {
 
 class _SettingState extends State<Setting> {
   final List<String> url = <String>[
-    'https://wrt.my.id',
     'https://trakteer.id/WorldRomanceTranslation',
     'https://www.facebook.com/WorldRomanceTranslation',
     'https://discord.com/invite/ktfqKn6',
     'https://wrt.my.id/contact-us/',
+    '#',
     '#',
     'https://wrt.my.id/dmca/',
     'https://wrt.my.id/privacy-policy/',
@@ -57,6 +56,7 @@ class _SettingState extends State<Setting> {
     setState(() {
       notif();
     });
+    OneSignal.shared.disablePush(isi);
   }
 
   void notif() async {
@@ -130,99 +130,11 @@ class _SettingState extends State<Setting> {
                 SizedBox(
                   height: 8,
                 ),
-                if (auth.currentUser == null)
-                  Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: FlatButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                type: PageTransitionType.bottomToTop,
-                                child: LoginScreen(),
-                              ));
-                        },
-                        color: Color.fromRGBO(228, 68, 238, 1),
-                        icon: Icon(
-                          Icons.email,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          "Login Email",
-                          style: TextStyle(color: Colors.white),
-                        )),
-                  ),
-                if (auth.currentUser != null)
-                  Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: FlatButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              PageTransition(
-                                type: PageTransitionType.bottomToTop,
-                                child: LoginScreen(),
-                              ));
-                        },
-                        color: Colors.redAccent,
-                        icon: Icon(
-                          Icons.email,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          auth.currentUser.email,
-                          style: TextStyle(color: Colors.white),
-                        )),
-                  ),
+                akunCek(),
                 SizedBox(
                   height: 15,
                 ),
-                (auth.currentUser != null)
-                    ? Padding(
-                        padding: EdgeInsets.only(left: 8),
-                        child: FutureBuilder(
-                          future: Database.getData("jenis"),
-                          builder: (context, snapshot) {
-                            if (snapshot.data == null)
-                              return Container(
-                                height: 35,
-                                width: 200,
-                                color: Colors.red,
-                                child: Center(
-                                  child: Text("Get Data..."),
-                                ),
-                              );
-                            else
-                              return Container(
-                                height: 35,
-                                width: 120,
-                                color: (snapshot.data['akun'] == "1")
-                                    ? Colors.green
-                                    : Colors.orangeAccent,
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      (snapshot.data['akun'] == "1")
-                                          ? Text("BETA",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold))
-                                          : Text("PUBLIC",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold)),
-                                    ],
-                                  ),
-                                ),
-                              );
-                          },
-                        ),
-                      )
-                    : SizedBox(
-                        height: 8,
-                      ),
+                jenisAkun(),
                 SizedBox(
                   height: 8,
                 ),
@@ -357,15 +269,20 @@ class _SettingState extends State<Setting> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(MdiIcons.bellAlert),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  "Notifikasi",
-                                  style: TextStyle(
-                                      color: Const.text, fontSize: 16),
+                                Row(
+                                  children: [
+                                    Icon(MdiIcons.bellAlert),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "Notifikasi",
+                                      style: TextStyle(
+                                          color: Const.text, fontSize: 16),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -591,24 +508,7 @@ class _SettingState extends State<Setting> {
                               onPressed: () {
                                 Syncron.addHistory()
                                     .then((value) => Navigator.pop(context))
-                                    .then((value) => Alert(
-                                          context: context,
-                                          type: AlertType.success,
-                                          title: "Upload Data Berhasil",
-                                          buttons: [
-                                            DialogButton(
-                                              child: Text(
-                                                "Oke",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20),
-                                              ),
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              width: 120,
-                                            )
-                                          ],
-                                        ).show());
+                                    .then((value) => alertSuccess());
                               },
                               color: Color.fromRGBO(0, 179, 134, 1.0),
                             ),
@@ -645,7 +545,7 @@ class _SettingState extends State<Setting> {
                                   width: 10,
                                 ),
                                 Text(
-                                  "Sinkron Data",
+                                  "Backup Data",
                                   style: TextStyle(
                                       color: Const.text, fontSize: 16),
                                 ),
@@ -673,28 +573,12 @@ class _SettingState extends State<Setting> {
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
-                              onPressed: () {
-                                Syncron.restoreHistory()
-                                    .then((value) => tes())
-                                    .then((value) => Navigator.pop(context))
-                                    .then((value) => Alert(
-                                          context: context,
-                                          type: AlertType.success,
-                                          title: "Restore Data Berhasil",
-                                          buttons: [
-                                            DialogButton(
-                                              child: Text(
-                                                "Oke",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20),
-                                              ),
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              width: 120,
-                                            )
-                                          ],
-                                        ).show());
+                              onPressed: () async {
+                                await Syncron.restoreHistory()
+                                    .then((value) =>
+                                        (value == 1) ? tes() : alertFailed())
+                                    .then((value) => Get.back())
+                                    .then((value) => alertSuccess());
                               },
                               color: Color.fromRGBO(0, 179, 134, 1.0),
                             ),
@@ -780,12 +664,8 @@ class _SettingState extends State<Setting> {
                       padding: EdgeInsets.only(left: 8),
                       child: InkWell(
                         onTap: () {
-                          AuthServices.signOut().then((value) =>
-                              Navigator.pushReplacement(
-                                  context,
-                                  PageTransition(
-                                      type: PageTransitionType.leftToRight,
-                                      child: Home())));
+                          AuthServices.signOut();
+                          setState(() {});
                         },
                         child: Container(
                           width: double.infinity,
@@ -833,13 +713,8 @@ class _SettingState extends State<Setting> {
                           if ((i == 1) || (i == 2) || (i == 3)) {
                             await launch(url[i]);
                           } else {
-                            Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.bottomToTop,
-                                  child:
-                                      Hal(jud: titl[i], link: url[i], ang: i),
-                                ));
+                            Get.to(
+                                () => Hal(jud: titl[i], link: url[i], ang: i));
                           }
                         },
                         child: Container(
@@ -862,11 +737,79 @@ class _SettingState extends State<Setting> {
                           ),
                         ),
                       )),
+                Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Container(
+                    width: double.infinity,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border(
+                            bottom:
+                                BorderSide(color: Colors.grey, width: 0.3))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Versi",
+                          style: TextStyle(color: Const.text, fontSize: 16),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 15),
+                          child: Text(
+                            "2.2.0",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  alertSuccess() {
+    return Alert(
+      context: context,
+      type: AlertType.success,
+      title: "Berhasil",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Oke",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Get.back(),
+          width: 120,
+        )
+      ],
+    ).show();
+  }
+
+  alertFailed() {
+    return Alert(
+      context: context,
+      type: AlertType.error,
+      title: "Gagal",
+      desc: "Tidak ada data bookmark di akun anda",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Oke",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () => Get.back(),
+          width: 120,
+        )
+      ],
+    ).show();
   }
 }

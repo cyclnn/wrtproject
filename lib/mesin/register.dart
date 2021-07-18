@@ -73,8 +73,12 @@ class Register extends StatelessWidget {
                       ),
                       onPressed: () async {
                         try {
-                          await auth.createUserWithEmailAndPassword(
-                              email: _email.text, password: _password.text);
+                          await auth
+                              .createUserWithEmailAndPassword(
+                                  email: _email.text, password: _password.text)
+                              .then((value) =>
+                                  Daftar.createOrupdate(_email.text, jenis: "1")
+                                      .then((value) => Navigator.pop(context)));
                         } on FirebaseAuthException catch (e) {
                           Alert(
                                   context: context,
@@ -82,8 +86,6 @@ class Register extends StatelessWidget {
                                   desc: e.message)
                               .show();
                         }
-                        Daftar.createOrupdate(_email.text, jenis: "1")
-                            .then((value) => Navigator.pop(context));
                       }),
                 ),
               ),

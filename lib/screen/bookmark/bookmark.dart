@@ -96,7 +96,7 @@ class _BookmarkState extends State<Bookmark> {
                                       GestureDetector(
                                         child: Padding(
                                           padding: EdgeInsets.only(
-                                              left: 8, right: 8),
+                                              left: 10, right: 10),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
@@ -104,69 +104,83 @@ class _BookmarkState extends State<Bookmark> {
                                               SizedBox(
                                                 height: 10,
                                               ),
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.redAccent,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                          bottomLeft: Radius
-                                                              .circular(4),
-                                                          bottomRight:
-                                                              Radius.circular(
-                                                                  4),
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  4),
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  4)),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.5),
-                                                      spreadRadius: 4,
-                                                      blurRadius: 5,
-                                                      offset: Offset(0,
-                                                          3), // changes position of shadow
-                                                    ),
-                                                  ],
-                                                ),
-                                                width:
-                                                    MediaQuery.maybeOf(context)
-                                                            .size
-                                                            .width /
-                                                        3.5,
-                                                height: 160,
-                                                child: Image.network(
-                                                  gambar.getAt(i),
-                                                  fit: BoxFit.fill,
-                                                  loadingBuilder: (context,
-                                                      child, loadingprogress) {
-                                                    if (loadingprogress == null)
-                                                      return child;
-                                                    return Container(
+                                              Wrap(
+                                                  alignment:
+                                                      WrapAlignment.center,
+                                                  children: [
+                                                    Container(
                                                       decoration: BoxDecoration(
-                                                          color: Colors.grey),
+                                                        color: Colors.redAccent,
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                                bottomLeft:
+                                                                    Radius
+                                                                        .circular(
+                                                                            4),
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            4),
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        4),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        4)),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            spreadRadius: 4,
+                                                            blurRadius: 5,
+                                                            offset: Offset(0,
+                                                                3), // changes position of shadow
+                                                          ),
+                                                        ],
+                                                      ),
                                                       width: MediaQuery.maybeOf(
                                                                   context)
                                                               .size
                                                               .width /
                                                           3.5,
                                                       height: 160,
-                                                      child: Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          valueColor:
-                                                              AlwaysStoppedAnimation<
-                                                                      Color>(
-                                                                  Colors
-                                                                      .deepPurple),
-                                                        ),
+                                                      child: Image.network(
+                                                        gambar.getAt(i),
+                                                        fit: BoxFit.fill,
+                                                        loadingBuilder: (context,
+                                                            child,
+                                                            loadingprogress) {
+                                                          if (loadingprogress ==
+                                                              null)
+                                                            return child;
+                                                          return Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                    color: Colors
+                                                                        .grey),
+                                                            width: MediaQuery
+                                                                        .maybeOf(
+                                                                            context)
+                                                                    .size
+                                                                    .width /
+                                                                3.5,
+                                                            height: 160,
+                                                            child: Center(
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                valueColor:
+                                                                    AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                        Colors
+                                                                            .deepPurple),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
+                                                    ),
+                                                  ]),
                                               SizedBox(
                                                 height: 6,
                                               ),
@@ -213,8 +227,7 @@ class _BookmarkState extends State<Bookmark> {
                                                   ),
                                               transition: Transition.downToUp);
                                         },
-                                        onDoubleTap: () {
-                                        },
+                                        onDoubleTap: () {},
                                       ),
                                   ],
                                 ),

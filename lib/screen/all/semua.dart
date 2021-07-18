@@ -3,12 +3,15 @@ import 'package:web_scraper/web_scraper.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/detailpage/detail.dart';
+import 'package:wrtproject/screen/Home/update.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AllKom extends StatefulWidget {
   TabController controller;
   int awal;
+  int ads3, ads2;
 
-  AllKom(this.controller, this.awal);
+  AllKom(this.controller, this.awal, this.ads3, this.ads2);
 
   @override
   _AllKomState createState() => _AllKomState();
@@ -46,10 +49,35 @@ class _AllKomState extends State<AllKom> {
     }
   }
 
+  InterstitialAd _interstitialAd;
+  ads() async {
+    if (widget.ads3 == 1) {
+      await InterstitialAd.load(
+          adUnitId: 'ca-app-pub-2816272273438312/4024299205',
+          request: AdRequest(),
+          adLoadCallback: InterstitialAdLoadCallback(
+            onAdLoaded: (InterstitialAd ad) {
+              // Keep a reference to the ad so you can show it later.
+              _interstitialAd = ad;
+            },
+            onAdFailedToLoad: (LoadAdError error) {
+              print('InterstitialAd failed to load: $error');
+            },
+          ));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    if (widget.ads3 == 1) ads();
     fetchKomik(num + 1);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd.dispose();
   }
 
   @override
@@ -76,67 +104,23 @@ class _AllKomState extends State<AllKom> {
               ),
               komikLoad
                   ? Wrap(
+                      alignment: WrapAlignment.center,
                       children: [
                         for (var i = 0; i < namakomik.length; i++)
                           GestureDetector(
                             child: Padding(
-                              padding: EdgeInsets.only(left: 13),
+                              padding: EdgeInsets.only(),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  Container(
-                                    width: 130,
-                                    height: 150,
-                                    child: Image.network(
-                                      imgkomik[i]['attributes']['src'],
-                                      fit: BoxFit.fill,
-                                      loadingBuilder:
-                                          (context, child, loadingprogress) {
-                                        if (loadingprogress == null)
-                                          return child;
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                              color: Const.cardcolor),
-                                          width: 120,
-                                          height: 150,
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                      Colors.deepPurple),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 3,
-                                  ),
-                                  Container(
-                                    width: 120,
-                                    child: Text(
-                                      namakomik[i]['attributes']['title'],
-                                      style: TextStyle(color: Const.text2),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 4,
-                                  ),
-                                  Container(
-                                    width: 120,
-                                    child: Text(
-                                      chkomik[i]['title'].toString().trim(),
-                                      style: TextStyle(
-                                          color: Const.textsm2, fontSize: 12),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                  UpdatePJ2(
+                                    komikImg: imgkomik[i]['attributes']['src'],
+                                    komikTitle: namakomik[i]['attributes']
+                                        ['title'],
+                                    ch: chkomik[i]['title'].split("Chapter")[1],
                                   ),
                                   SizedBox(
                                     height: 10,
@@ -144,11 +128,14 @@ class _AllKomState extends State<AllKom> {
                                 ],
                               ),
                             ),
-                            onTap: () {
+                            onTap: () async {
+                              if (widget.ads3 == 1)
+                                await _interstitialAd.show();
                               Navigator.of(context).push(PageTransition(
                                   type: PageTransitionType.bottomToTop,
                                   child: Detail(
                                       lnk: link[i]['attributes']['href'],
+                                      ads: widget.ads2,
                                       gambar: imgkomik[i]['attributes']['src'],
                                       nama: namakomik[i]['attributes']
                                           ['title'])));
@@ -157,22 +144,24 @@ class _AllKomState extends State<AllKom> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            FlatButton.icon(
-                                icon: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white,
-                                ),
-                                color: Colors.red,
-                                onPressed: () {
-                                  setState(() {
-                                    komikLoad = false;
-                                    fetchKomik(num--);
-                                  });
-                                },
-                                label: Text(
-                                  "Prev Page",
-                                  style: TextStyle(color: Colors.white),
-                                )),
+                            (num > 1)
+                                ? FlatButton.icon(
+                                    icon: Icon(
+                                      Icons.arrow_back_ios,
+                                      color: Colors.white,
+                                    ),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      setState(() {
+                                        komikLoad = false;
+                                        fetchKomik(num--);
+                                      });
+                                    },
+                                    label: Text(
+                                      "Prev Page",
+                                      style: TextStyle(color: Colors.white),
+                                    ))
+                                : SizedBox(),
                             SizedBox(
                               height: 20,
                             ),

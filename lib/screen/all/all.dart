@@ -3,6 +3,7 @@ import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/all/recent.dart';
 import 'package:wrtproject/screen/all/pj.dart';
 import 'package:wrtproject/screen/all/semua.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Semua extends StatefulWidget {
   @override
@@ -11,9 +12,17 @@ class Semua extends StatefulWidget {
 
 class _SemuaState extends State<Semua> with SingleTickerProviderStateMixin {
   TabController controller;
+  var ads2, ads3;
+  cekAds() async {
+    SharedPreferences ad = await SharedPreferences.getInstance();
+    ads2 = ad.getInt("Ads2");
+    ads3 = ad.getInt("Ads3");
+  }
+
   @override
   void initState() {
     super.initState();
+    cekAds();
     controller = TabController(vsync: this, length: 3);
   }
 
@@ -71,8 +80,8 @@ class _SemuaState extends State<Semua> with SingleTickerProviderStateMixin {
         controller: controller,
         children: <Widget>[
           Recent(controller),
-          AllKom(controller, 1),
-          AllPj(controller),
+          AllKom(controller, 1, ads3, ads2),
+          AllPj(controller, ads3, ads2),
         ],
       ),
     );

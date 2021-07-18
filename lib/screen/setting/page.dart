@@ -22,11 +22,9 @@ class _HalState extends State<Hal> {
     null,
     null,
     null,
-    null,
     Contact(),
     Dmca(),
     Dmca(),
-    Privacy(),
     Privacy(),
     Help()
   ];

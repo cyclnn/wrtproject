@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:wrtproject/mesin/database.dart';
-import 'package:wrtproject/mesin/history.dart';
 import 'package:wrtproject/screen/Home/chatango.dart';
-import 'package:wrtproject/screen/detailpage/detail.dart';
-import 'package:wrtproject/screen/Home/populer.dart';
+import 'package:wrtproject/screen/Home/donasi.dart';
+import 'package:wrtproject/screen/Home/komikcard/populer_card.dart';
+import 'package:wrtproject/screen/Home/komikcard/update_card.dart';
 import 'package:wrtproject/screen/search/search.dart';
-import 'package:wrtproject/screen/Home/update.dart';
 import 'package:web_scraper/web_scraper.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../mesin/const.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class Dash extends StatefulWidget {
   @override
@@ -88,20 +85,32 @@ class _DashState extends State<Dash> {
     }
   }
 
- 
+  var ads, ads2;
+
+  cekAds() async {
+    SharedPreferences ad = await SharedPreferences.getInstance();
+    ads = ad.getInt("Ads1");
+    ads2 = ad.getInt("Ads2");
+  }
+
+
 
   @override
   void initState() {
     addStringToSF();
     super.initState();
     fetchKomik();
+    cekAds();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Const.baseColor);
-    FirebaseAuth auth = FirebaseAuth.instance;
-
     Size screensize = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
@@ -161,422 +170,20 @@ class _DashState extends State<Dash> {
                       SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 3,
-                              blurRadius: 7,
-                              offset:
-                                  Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: GestureDetector(
-                          child: Image.asset(
-                            "assets/img/tr.png",
-                            width: double.infinity,
-                            height: 90,
-                          ),
-                          onTap: () async {
-                            await launch(
-                                "https://trakteer.id/WorldRomanceTranslation");
-                          },
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Const.cardcolor,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(4),
-                              bottomRight: Radius.circular(4),
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(4)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset:
-                                  Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        margin: EdgeInsets.only(top: 8),
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Text(
-                                'TERPOPULER HARI INI',
-                                style: TextStyle(
-                                    color: Const.text,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Divider(
-                              color: Const.text,
-                            ),
-                            Wrap(children: [
-                              Container(
-                                height: 230,
-                                child: ListView(
-                                  physics: BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  children: [
-                                    for (var i = 0; i < 5; i++)
-                                      GestureDetector(
-                                        child: Populer(
-                                            komikImg: hotlist[i]['attributes']
-                                                ['src'],
-                                            komikTitle: hotnama[i]['attributes']
-                                                ['title'],
-                                            chhot: hotch[i]['title']
-                                                .toString()
-                                                .trim(),
-                                            star: rating[0]['title']
-                                                .toString()
-                                                .trim()),
-                                        onTap: () async {
-                                          if (udah[i] == "false") {
-                                            udah[i] = "true";
-                                            history++;
-                                            SharedPreferences prefs =
-                                                await SharedPreferences
-                                                    .getInstance();
-                                            prefs.setInt(
-                                                'history$history', history);
-                                            prefs.setInt('nilai', history);
-                                            Get.to(
-                                                () => Detail(
-                                                      lnk: link[i]['attributes']
-                                                          ['href'],
-                                                      gambar: hotlist[i]
-                                                          ['attributes']['src'],
-                                                      nama: hotnama[i]
-                                                              ['attributes']
-                                                          ['title'],
-                                                      urut: i,
-                                                      id: prefs.getInt(
-                                                          'history$history'),
-                                                    ),
-                                                transition:
-                                                    Transition.downToUp);
-                                          } else {
-                                            SharedPreferences prefs =
-                                                await SharedPreferences
-                                                    .getInstance();
-
-                                            prefs.setInt(
-                                                'history$history', history);
-                                            prefs.setInt('nilai', history);
-                                            Get.to(
-                                                () => Detail(
-                                                      lnk: link[i]['attributes']
-                                                          ['href'],
-                                                      gambar: hotlist[i]
-                                                          ['attributes']['src'],
-                                                      nama: hotnama[i]
-                                                              ['attributes']
-                                                          ['title'],
-                                                      urut: i,
-                                                      id: 100,
-                                                    ),
-                                                transition:
-                                                    Transition.downToUp);
-                                          }
-                                        },
-                                      )
-                                  ],
-                                ),
-                              )
-                            ]),
-                          ],
-                        ),
-                      ),
+                      
+                      donasi(),
+                      populerCard(
+                          hotlist, hotnama, hotch, rating, link, ads, ads2),
                       SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Const.cardcolor,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(4),
-                              bottomRight: Radius.circular(4),
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(4)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset:
-                                  Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        margin: EdgeInsets.only(top: 8),
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Text(
-                                'UPDATE WRT',
-                                style: TextStyle(
-                                    color: Const.text,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Divider(
-                              color: Const.text,
-                            ),
-                            Center(
-                              child: LayoutBuilder(
-                                builder: (BuildContext context,
-                                        BoxConstraints constraints) =>
-                                    Wrap(
-                                  children: [
-                                    for (var i = 0; i < 15; i++)
-                                      Column(
-                                        children: [
-                                          GestureDetector(
-                                            child: (constraints.maxWidth >
-                                                        300 &&
-                                                    constraints.maxWidth < 500)
-                                                ? UpdatePJ2(
-                                                    komikImg: komiklist[i]
-                                                        ['attributes']['src'],
-                                                    komikTitle: namalist[i]
-                                                        ['attributes']['title'],
-                                                    ch: chlist[i]['attributes']
-                                                        ['title'],
-                                                  )
-                                                : (constraints.maxWidth > 500 &&
-                                                        constraints.maxWidth <
-                                                            1000)
-                                                    ? UpdatePJ(
-                                                        komikImg: komiklist[i]
-                                                                ['attributes']
-                                                            ['src'],
-                                                        komikTitle: namalist[i]
-                                                                ['attributes']
-                                                            ['title'],
-                                                        ch: chlist[i]
-                                                                ['attributes']
-                                                            ['title'],
-                                                      )
-                                                    : UpdatePJ2(
-                                                        komikImg: komiklist[i]
-                                                                ['attributes']
-                                                            ['src'],
-                                                        komikTitle: namalist[i]
-                                                                ['attributes']
-                                                            ['title'],
-                                                        ch: chlist[i]
-                                                                ['attributes']
-                                                            ['title'],
-                                                      ),
-                                            onTap: () {
-                                              Get.to(
-                                                  () => Detail(
-                                                      lnk: linkup[i]
-                                                              ['attributes']
-                                                          ['href'],
-                                                      gambar: komiklist[i]
-                                                          ['attributes']['src'],
-                                                      nama: namalist[i]
-                                                              ['attributes']
-                                                          ['title']),
-                                                  transition:
-                                                      Transition.downToUp);
-                                            },
-                                            onLongPress: () {},
-                                          ),
-                                        ],
-                                      )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      updateCard(komiklist, namalist, chlist, linkup,
+                          "UPDATE WRT", 0, 15, ads, ads2),
                       SizedBox(
                         height: 10,
                       ),
-                      Container(
-                          decoration: BoxDecoration(
-                            color: Const.cardcolor,
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(4),
-                                bottomRight: Radius.circular(4),
-                                topLeft: Radius.circular(4),
-                                topRight: Radius.circular(4)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          margin: EdgeInsets.only(top: 8),
-                          width: double.infinity,
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: Text(
-                                    'UPDATE TERBARU',
-                                    style: TextStyle(
-                                        color: Const.text,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Divider(
-                                  color: Const.text,
-                                ),
-                                (auth.currentUser == null)
-                                    ? Center(
-                                        child: Container(
-                                          margin: EdgeInsets.all(100),
-                                          height: 35,
-                                          width: 200,
-                                          color: Colors.red,
-                                          child: Center(
-                                            child: Text("Please Login"),
-                                          ),
-                                        ),
-                                      )
-                                    : Center(
-                                        child: FutureBuilder(
-                                          future: Database.getData("jenis"),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.data['akun'] != "1")
-                                              return Center(
-                                                child: Container(
-                                                  margin: EdgeInsets.all(100),
-                                                  height: 35,
-                                                  width: 200,
-                                                  color: Colors.red,
-                                                  child: Center(
-                                                    child: Text("Beta Test"),
-                                                  ),
-                                                ),
-                                              );
-                                            else
-                                              return LayoutBuilder(
-                                                builder: (BuildContext context,
-                                                        BoxConstraints
-                                                            constraints) =>
-                                                    Wrap(
-                                                  children: [
-                                                    for (var i = 15;
-                                                        i < 39;
-                                                        i++)
-                                                      GestureDetector(
-                                                        child: (constraints
-                                                                        .maxWidth >
-                                                                    300 &&
-                                                                constraints
-                                                                        .maxWidth <
-                                                                    500)
-                                                            ? UpdatePJ2(
-                                                                komikImg:
-                                                                    komiklist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        ['src'],
-                                                                komikTitle: namalist[
-                                                                            i][
-                                                                        'attributes']
-                                                                    ['title'],
-                                                                ch: chlist[i][
-                                                                        'attributes']
-                                                                    ['title'],
-                                                              )
-                                                            : (constraints.maxWidth >
-                                                                        500 &&
-                                                                    constraints
-                                                                            .maxWidth <
-                                                                        1000)
-                                                                ? UpdatePJ(
-                                                                    komikImg: komiklist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        ['src'],
-                                                                    komikTitle: namalist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        [
-                                                                        'title'],
-                                                                    ch: chlist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        [
-                                                                        'title'],
-                                                                  )
-                                                                : UpdatePJ2(
-                                                                    komikImg: komiklist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        ['src'],
-                                                                    komikTitle: namalist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        [
-                                                                        'title'],
-                                                                    ch: chlist[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        [
-                                                                        'title'],
-                                                                  ),
-                                                        onTap: () {
-                                                          Get.to(
-                                                              () => Detail(
-                                                                  lnk: linkup[i]
-                                                                          ['attributes']
-                                                                      ['href'],
-                                                                  gambar: komiklist[i]
-                                                                          ['attributes']
-                                                                      ['src'],
-                                                                  nama: namalist[
-                                                                              i]
-                                                                          ['attributes']
-                                                                      [
-                                                                      'title']),
-                                                              transition:
-                                                                  Transition
-                                                                      .downToUp);
-                                                          History.createOrupdate(
-                                                              1,
-                                                              nama: namalist[i][
-                                                                      'attributes']
-                                                                  ['title'],
-                                                              img: komiklist[i][
-                                                                      'attributes']
-                                                                  ['src'],
-                                                              link: linkup[i][
-                                                                      'attributes']
-                                                                  ['href']);
-                                                        },
-                                                      )
-                                                  ],
-                                                ),
-                                              );
-                                          },
-                                        ),
-                                      ),
-                              ])),
+                      updateCard(komiklist, namalist, chlist, linkup,
+                          "UPDATE TERBARU", 15, 39, ads, ads2),
                       SizedBox(
                         height: 30,
                       )

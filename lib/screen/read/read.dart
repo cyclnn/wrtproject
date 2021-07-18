@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:flutter/widgets.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/komen/komen.dart';
@@ -9,6 +8,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:wrtproject/screen/lapor/lapor.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:wrtproject/screen/loading/loading.dart';
+import 'package:wrtproject/screen/read/native.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Read extends StatefulWidget {
   final String link, linkkomik, namakom, linkdet, img, id;
@@ -40,6 +42,7 @@ class _ReadState extends State<Read> {
   List<Map<String, dynamic>> ch;
   String akhir2, akhir3;
   var panjang, url;
+  var moderead;
   var preferences;
 
   int load = 0;
@@ -63,6 +66,8 @@ class _ReadState extends State<Read> {
       String akhir = ch[0]['title'].split("Chapter")[1];
       akhir2 = akhir.split("Bahasa")[0];
       akhir3 = akhir.split("Bahasa")[0];
+      SharedPreferences mode = await SharedPreferences.getInstance();
+      moderead = mode.getInt("readmode");
 
       setState(() {
         if (blogger.length > 1) {
@@ -86,6 +91,8 @@ class _ReadState extends State<Read> {
       });
     }
   }
+
+  void cekRead() async {}
 
   recent() async {
     preferences = await StreamingSharedPreferences.instance;
@@ -145,283 +152,173 @@ class _ReadState extends State<Read> {
             ),
             child: GestureDetector(
               onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(25),
-                      ),
-                    ),
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    builder: (context) {
-                      return Container(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                      icon: Icon(Icons.warning),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context).push(
-                                            PageTransition(
-                                                type: PageTransitionType.fade,
-                                                child: Lapor()));
-                                      }),
-                                  IconButton(
-                                      icon: Icon(Icons.message),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context)
-                                            .push(PageTransition(
-                                                type: PageTransitionType.fade,
-                                                child: Komen(
-                                                  lnk: komen[0]['attributes']
-                                                      ['href'],
-                                                )));
-                                      }),
-                                  IconButton(
-                                      icon: Icon(Icons.close),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      }),
-                                ],
-                              ),
-                              Divider(
-                                height: 10,
-                                color: Colors.grey,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 15, left: 15, right: 15),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Container(
-                                          width: 80,
-                                          child: Image.network(gbr),
-                                        )
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 20),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width: 250,
-                                            child: Text(
-                                              widget.namakom,
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 15,
-                                          ),
-                                          Text("Chapter" + akhir2,
-                                              style: TextStyle(fontSize: 15)),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  (widget.urut < linkch.length)
-                                      ? IconButton(
-                                          icon: Icon(Icons.arrow_back),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-
-                                            Navigator.of(context)
-                                                .pushReplacement(PageTransition(
-                                                    type: PageTransitionType
-                                                        .bottomToTop,
-                                                    child: Read(
-                                                      img: gbr,
-                                                      id: widget.id,
-                                                      urut: widget.urut + 1,
-                                                      linkkomik:
-                                                          widget.linkkomik,
-                                                      link: linkch[widget.urut +
-                                                              1]['attributes']
-                                                          ['href'],
-                                                      namakom: widget.namakom,
-                                                    )));
-                                          })
-                                      : SizedBox(),
-                                  (widget.urut != 0)
-                                      ? IconButton(
-                                          icon: Icon(Icons.arrow_forward),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            Navigator.of(context)
-                                                .pushReplacement(PageTransition(
-                                                    type: PageTransitionType
-                                                        .bottomToTop,
-                                                    child: Read(
-                                                      img: gbr,
-                                                      id: widget.id,
-                                                      urut: widget.urut - 1,
-                                                      linkkomik:
-                                                          widget.linkkomik,
-                                                      link: linkch[widget.urut -
-                                                              1]['attributes']
-                                                          ['href'],
-                                                      namakom: widget.namakom,
-                                                    )));
-                                          })
-                                      : SizedBox(
-                                          height: 0,
-                                        )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    });
+                modalBottom(gbr);
               },
               child: Container(
-                color: Const.bgcolor,
-                width: double.infinity,
-                child: SmartRefresher(
-                  controller: _refreshController,
-                  enablePullDown: true,
-                  onRefresh: _onRefresh,
-                  child: ListView.builder(
-                      itemCount: panjang,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (context, k) => (url != blogger)
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  decoration:
-                                      BoxDecoration(color: Const.bgcolor),
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: CachedNetworkImage(
-                                      imageUrl: url[k]['attributes']['src'],
-                                      progressIndicatorBuilder:
-                                          (context, url, downloadProgress) =>
-                                              Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: double.infinity,
-                                        height: 200,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value: downloadProgress.progress,
-                                            valueColor:
-                                                new AlwaysStoppedAnimation<
-                                                    Color>(Const.text2),
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: 120,
-                                        height: 150,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.error,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: CachedNetworkImage(
-                                      imageUrl: url[k]['attributes']['href'],
-                                      progressIndicatorBuilder:
-                                          (context, url, downloadProgress) =>
-                                              Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: double.infinity,
-                                        height: 250,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value: downloadProgress.progress,
-                                            valueColor:
-                                                new AlwaysStoppedAnimation<
-                                                    Color>(Const.text2),
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.transparent),
-                                        width: 120,
-                                        height: 150,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.error,
-                                            color: Const.text2,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                ),
-              ),
-            ))
-        : Stack(
-            children: [
-              Container(
+                  color: Const.bgcolor,
                   width: double.infinity,
-                  height: screensize.height,
-                  decoration: BoxDecoration(color: Const.bgcolor),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  child: (moderead == 1)
+                      ? SmartRefresher(
+                          controller: _refreshController,
+                          enablePullDown: true,
+                          onRefresh: _onRefresh,
+                          child: nativeRead(panjang, url, blogger))
+                      : (moderead == 2)
+                          ? SmartRefresher(
+                              controller: _refreshController,
+                              enablePullDown: true,
+                              onRefresh: _onRefresh,
+                              child: nativeRead(panjang, url, blogger))
+                          : SmartRefresher(
+                              controller: _refreshController,
+                              enablePullDown: true,
+                              onRefresh: _onRefresh,
+                              child: nativeRead(panjang, url, blogger))),
+            ))
+        : loadingScreen(screensize);
+  }
+
+  // Modal Bottom
+
+  modalBottom(String gbr) {
+    return showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(25),
+          ),
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        builder: (context) {
+          return Container(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.warning),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(PageTransition(
+                                type: PageTransitionType.fade, child: Lapor()));
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.message),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(PageTransition(
+                                type: PageTransitionType.fade,
+                                child: Komen(
+                                  lnk: komen[0]['attributes']['href'],
+                                )));
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          }),
+                    ],
+                  ),
+                  Divider(
+                    height: 10,
+                    color: Colors.grey,
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 15, left: 15, right: 15),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Const.text2),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Container(
+                              width: 80,
+                              child: Image.network(gbr),
+                            )
+                          ],
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          "Loading...",
-                          style: TextStyle(fontSize: 18, color: Const.text2),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 250,
+                                child: Text(
+                                  widget.namakom,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Text("Chapter" + akhir2,
+                                  style: TextStyle(fontSize: 15)),
+                            ],
+                          ),
                         )
                       ],
                     ),
-                  ))
-            ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      (widget.urut < linkch.length)
+                          ? IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+
+                                Navigator.of(context)
+                                    .pushReplacement(PageTransition(
+                                        type: PageTransitionType.bottomToTop,
+                                        child: Read(
+                                          img: gbr,
+                                          id: widget.id,
+                                          urut: widget.urut + 1,
+                                          linkkomik: widget.linkkomik,
+                                          link: linkch[widget.urut + 1]
+                                              ['attributes']['href'],
+                                          namakom: widget.namakom,
+                                        )));
+                              })
+                          : SizedBox(),
+                      (widget.urut != 0)
+                          ? IconButton(
+                              icon: Icon(Icons.arrow_forward),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context)
+                                    .pushReplacement(PageTransition(
+                                        type: PageTransitionType.bottomToTop,
+                                        child: Read(
+                                          img: gbr,
+                                          id: widget.id,
+                                          urut: widget.urut - 1,
+                                          linkkomik: widget.linkkomik,
+                                          link: linkch[widget.urut - 1]
+                                              ['attributes']['href'],
+                                          namakom: widget.namakom,
+                                        )));
+                              })
+                          : SizedBox(
+                              height: 0,
+                            )
+                    ],
+                  )
+                ],
+              ),
+            ),
           );
+        });
   }
 }

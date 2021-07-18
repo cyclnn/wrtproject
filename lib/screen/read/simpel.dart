@@ -110,7 +110,6 @@ class _Mode3State extends State<Mode3> {
 
   @override
   Widget build(BuildContext context) {
-    Size screensize = MediaQuery.of(context).size;
     var gbr = widget.img;
 
     return (load == 1)
