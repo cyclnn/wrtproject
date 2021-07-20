@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/detailpage/detail.dart';
 
@@ -62,7 +63,7 @@ class _DetgenState extends State<Detgen> {
       ),
       body: Container(
           decoration: BoxDecoration(
-            color: Color.fromRGBO(34, 34, 34, 1),
+            color: Const.bgcolor,
           ),
           width: double.infinity,
           height: MediaQuery.of(context).size.height,
@@ -75,91 +76,93 @@ class _DetgenState extends State<Detgen> {
                 ),
                 komikLoad
                     ? Wrap(
+                        alignment: WrapAlignment.center,
                         children: [
                           for (var i = 0; i < namakomik.length; i++)
                             GestureDetector(
                               child: Padding(
-                                padding: EdgeInsets.only(left: 13),
+                                padding: EdgeInsets.only(left: 10, right: 10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Stack(
-                                      children: <Widget>[
-                                        Container(
-                                          width: 120,
-                                          height: 150,
-                                          child: Image.network(
-                                            imgkomik[i]['attributes']['src'],
-                                            fit: BoxFit.fill,
-                                            loadingBuilder: (context, child,
-                                                loadingprogress) {
-                                              if (loadingprogress == null)
-                                                return child;
-                                              return Container(
-                                                decoration: BoxDecoration(
-                                                    color: Colors.grey),
-                                                width: 120,
-                                                height: 150,
-                                                child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                                Color>(
-                                                            Colors.deepPurple),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        Positioned(
-                                          bottom: 5,
-                                          right: 5,
-                                          child: Container(
-                                            width: 50,
-                                            height: 20,
+                                    Wrap(
+                                        alignment: WrapAlignment.center,
+                                        children: [
+                                          Container(
                                             decoration: BoxDecoration(
-                                                color: Colors.green,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(30))),
-                                            child: Center(
-                                              child: Text(
-                                                "Manga",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
+                                              color: Colors.redAccent,
+                                              borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(4),
+                                                  bottomRight:
+                                                      Radius.circular(4),
+                                                  topLeft: Radius.circular(4),
+                                                  topRight: Radius.circular(4)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.5),
+                                                  spreadRadius: 4,
+                                                  blurRadius: 5,
+                                                  offset: Offset(0,
+                                                      3), // changes position of shadow
+                                                ),
+                                              ],
+                                            ),
+                                            width: MediaQuery.maybeOf(context)
+                                                    .size
+                                                    .width /
+                                                3.5,
+                                            height: 160,
+                                            child: Image.network(
+                                              imgkomik[i]['attributes']['src'],
+                                              fit: BoxFit.fill,
+                                              loadingBuilder: (context, child,
+                                                  loadingprogress) {
+                                                if (loadingprogress == null)
+                                                  return child;
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey),
+                                                  width: MediaQuery.maybeOf(
+                                                              context)
+                                                          .size
+                                                          .width /
+                                                      3.5,
+                                                  height: 160,
+                                                  child: Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                                  Color>(
+                                                              Colors
+                                                                  .deepPurple),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
+                                        ]),
                                     SizedBox(
-                                      height: 3,
+                                      height: 6,
                                     ),
                                     Container(
-                                      width: 120,
+                                      width: MediaQuery.maybeOf(context)
+                                              .size
+                                              .width /
+                                          3.5,
                                       child: Text(
                                         namakomik[i]['attributes']['title'],
-                                        style: TextStyle(color: Colors.white),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 4,
-                                    ),
-                                    Container(
-                                      width: 120,
-                                      child: Text(
-                                        chkomik[i]['title'].toString().trim(),
-                                        style: TextStyle(
-                                            color: Colors.grey, fontSize: 12),
+                                        style: GoogleFonts.firaSans(
+                                            textStyle: TextStyle(
+                                                color: Const.text,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18)),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -171,37 +174,42 @@ class _DetgenState extends State<Detgen> {
                                 ),
                               ),
                               onTap: () {
-                                Navigator.of(context).push(PageTransition(
-                                    type: PageTransitionType.bottomToTop,
-                                    child: Detail(
-                                        lnk: link[i]['attributes']['href'],
-                                        gambar: imgkomik[i]['attributes']
-                                            ['src'],
-                                        nama: namakomik[i]['attributes']
-                                            ['title'])));
+                                Get.to(
+                                    () => Detail(
+                                          lnk: link[i]['attributes']['href'],
+                                          gambar: imgkomik[i]['attributes']
+                                              ['src'],
+                                          nama: namakomik[i]['attributes']
+                                              ['title'],
+                                        ),
+                                    transition: Transition.downToUp);
                               },
+                              onDoubleTap: () {},
                             ),
                           (namakomik.length > 9)
                               ? Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    FlatButton.icon(
-                                        icon: Icon(
-                                          Icons.arrow_back_ios,
-                                          color: Colors.white,
-                                        ),
-                                        color: Colors.red,
-                                        onPressed: () {
-                                          setState(() {
-                                            komikLoad = false;
-                                            fetchKomik(num--);
-                                          });
-                                        },
-                                        label: Text(
-                                          "Prev Page",
-                                          style: TextStyle(color: Colors.white),
-                                        )),
+                                    (num > 1)
+                                        ? FlatButton.icon(
+                                            icon: Icon(
+                                              Icons.arrow_back_ios,
+                                              color: Colors.white,
+                                            ),
+                                            color: Colors.red,
+                                            onPressed: () {
+                                              setState(() {
+                                                komikLoad = false;
+                                                fetchKomik(num--);
+                                              });
+                                            },
+                                            label: Text(
+                                              "Prev Page",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ))
+                                        : SizedBox(),
                                     SizedBox(
                                       height: 20,
                                     ),

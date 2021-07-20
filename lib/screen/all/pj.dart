@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:wrtproject/mesin/const.dart';
+import 'package:wrtproject/screen/Home/update.dart';
 import 'package:wrtproject/screen/detailpage/detail.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AllPj extends StatefulWidget {
   TabController controller;
+  int ads3, ads2;
 
-  AllPj(this.controller);
+  AllPj(this.controller, this.ads3, this.ads2);
 
   @override
   _AllPjState createState() => _AllPjState();
@@ -16,6 +18,7 @@ class AllPj extends StatefulWidget {
 
 class _AllPjState extends State<AllPj> {
   bool komikLoad = false;
+  var akhir2;
   int num = 1;
   List<Map<String, dynamic>> namakomik;
   List<Map<String, dynamic>> imgkomik;
@@ -45,7 +48,26 @@ class _AllPjState extends State<AllPj> {
 
       setState(() {
         komikLoad = true;
+        print(akhir2);
       });
+    }
+  }
+
+  InterstitialAd _interstitialAd;
+  ads() async {
+    if (widget.ads3 == 1) {
+      await InterstitialAd.load(
+          adUnitId: 'ca-app-pub-2816272273438312/4024299205',
+          request: AdRequest(),
+          adLoadCallback: InterstitialAdLoadCallback(
+            onAdLoaded: (InterstitialAd ad) {
+              // Keep a reference to the ad so you can show it later.
+              _interstitialAd = ad;
+            },
+            onAdFailedToLoad: (LoadAdError error) {
+              print('InterstitialAd failed to load: $error');
+            },
+          ));
     }
   }
 
@@ -53,6 +75,13 @@ class _AllPjState extends State<AllPj> {
   void initState() {
     super.initState();
     fetchKomik(num + 1);
+    if (widget.ads3 == 1) ads();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd.dispose();
   }
 
   @override
@@ -79,123 +108,38 @@ class _AllPjState extends State<AllPj> {
               ),
               komikLoad
                   ? Wrap(
+                      alignment: WrapAlignment.center,
                       children: [
                         for (var i = 0; i < 15; i++)
                           GestureDetector(
                             child: Padding(
-                              padding: EdgeInsets.only(left: 13),
+                              padding: EdgeInsets.only(),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  Stack(
-                                    children: <Widget>[
-                                      Container(
-                                        width: 120,
-                                        height: 150,
-                                        child: CachedNetworkImage(
-                                          imageUrl: imgkomik[i]['attributes']
-                                              ['src'],
-                                          fit: BoxFit.fill,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                            width: 120,
-                                            height: 150,
-                                            child: Center(
-                                              child: CircularProgressIndicator(
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                            Color>(
-                                                        Colors.deepPurple),
-                                              ),
-                                            ),
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 5,
-                                        right: 5,
-                                        child: Container(
-                                          width: 50,
-                                          height: 20,
-                                          decoration: BoxDecoration(
-                                              color: Colors.green,
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(30))),
-                                          child: Center(
-                                            child: Text(
-                                              "Manga",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      (hot[0]['attributes']['class'] != null)
-                                          ? Positioned(
-                                              top: 5,
-                                              left: 5,
-                                              child: Container(
-                                                width: 15,
-                                                height: 15,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.green,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "H",
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          : null
-                                    ],
+                                  UpdatePJ2(
+                                    komikImg: imgkomik[i]['attributes']['src'],
+                                    komikTitle: namakomik[i]['attributes']
+                                        ['title'],
+                                    ch: chkomik[i]['title'].split("Chapter")[1],
                                   ),
                                   SizedBox(
                                     height: 3,
                                   ),
-                                  Container(
-                                    width: 120,
-                                    child: Text(
-                                      namakomik[i]['attributes']['title'],
-                                      style: TextStyle(color: Const.text2),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 4,
-                                  ),
-                                  Container(
-                                    width: 120,
-                                    child: Text(
-                                      chkomik[i]['title'].toString().trim(),
-                                      style: TextStyle(
-                                          color: Const.textsm2, fontSize: 12),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  )
                                 ],
                               ),
                             ),
-                            onTap: () {
+                            onTap: () async {
+                              if (widget.ads3 == 1)
+                                await _interstitialAd.show();
                               Navigator.of(context).push(PageTransition(
                                   type: PageTransitionType.bottomToTop,
                                   child: Detail(
                                       lnk: link[i]['attributes']['href'],
+                                      ads: widget.ads3,
                                       gambar: imgkomik[i]['attributes']['src'],
                                       nama: namakomik[i]['attributes']
                                           ['title'])));
@@ -204,22 +148,24 @@ class _AllPjState extends State<AllPj> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            FlatButton.icon(
-                                icon: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white,
-                                ),
-                                color: Colors.red,
-                                onPressed: () {
-                                  setState(() {
-                                    komikLoad = false;
-                                    fetchKomik(num--);
-                                  });
-                                },
-                                label: Text(
-                                  "Prev Page",
-                                  style: TextStyle(color: Colors.white),
-                                )),
+                            (num > 1)
+                                ? FlatButton.icon(
+                                    icon: Icon(
+                                      Icons.arrow_back_ios,
+                                      color: Colors.white,
+                                    ),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      setState(() {
+                                        komikLoad = false;
+                                        fetchKomik(num--);
+                                      });
+                                    },
+                                    label: Text(
+                                      "Prev Page",
+                                      style: TextStyle(color: Colors.white),
+                                    ))
+                                : SizedBox(),
                             SizedBox(
                               height: 20,
                             ),

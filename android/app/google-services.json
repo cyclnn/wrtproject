@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "775423959688",
+    "firebase_url": "https://world-romance-translation-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "world-romance-translation",
     "storage_bucket": "world-romance-translation.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "775423959688-qfjeir5k3epdbjkco2vuuvf4oepqerbu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wrtproject",
+            "certificate_hash": "edb12716bd7e4b7bdf02706cd89390d5b8dfdcd9"
+          }
+        },
         {
           "client_id": "775423959688-sdllou4t9mq2pk8u7lni49v8sc22mvrl.apps.googleusercontent.com",
           "client_type": 3

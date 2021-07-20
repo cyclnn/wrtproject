@@ -20,14 +20,28 @@ import 'package:hive/hive.dart';
 import 'mesin/global.dart' as globals;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> initPlatformState() async {
+  MobileAds.instance.initialize();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var perm;
   if (prefs.getInt("readmode") == null) {
     prefs.setInt("readmode", 1);
   }
+
+  dynamic legt2;
+  CollectionReference data = FirebaseFirestore.instance.collection("Server");
+  await data.doc("Ads").get().then<dynamic>((DocumentSnapshot value) async {
+    legt2 = value.data();
+  });
+  
+
+  prefs.setInt("Ads1", legt2['home']);
+  prefs.setInt("Ads2", legt2['chapter']);
+  prefs.setInt("Ads3", legt2['listpage']);
+
   OneSignal.shared.setAppId("be7dac02-14fd-470f-bf7d-5ba24e08bdd2");
 
   OneSignal.shared.setNotificationOpenedHandler((openedResult) {
@@ -48,6 +62,7 @@ Future<void> initPlatformState() async {
 Future<void> main() async {
   globals.appNavigator = GlobalKey<NavigatorState>();
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Hive.initFlutter();
   await Hive.openBox('title');
   await Hive.openBox('gambar');

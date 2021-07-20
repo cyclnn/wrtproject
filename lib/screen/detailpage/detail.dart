@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:wrtproject/mesin/const.dart';
-import 'package:wrtproject/mesin/modebaca.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:wrtproject/screen/detailpage/chapter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:wrtproject/screen/komen/komen.dart';
+import 'package:wrtproject/screen/loading/loading.dart';
 import 'package:wrtproject/screen/nullpage/page.dart';
 import 'package:wrtproject/screen/read/read.dart';
 import 'package:wrtproject/screen/genrepage/detail_genre.dart';
@@ -15,13 +16,14 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
-import 'package:wrtproject/screen/read/simpel.dart';
-import '../read/webview.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class Detail extends StatefulWidget {
+  final int ads;
   final String lnk, nama, gambar;
   final int urut, id;
-  const Detail({Key key, this.lnk, this.nama, this.gambar, this.urut, this.id})
+  const Detail(
+      {Key key, this.lnk, this.nama, this.gambar, this.urut, this.id, this.ads})
       : super(key: key);
 
   @override
@@ -51,6 +53,7 @@ class _DetailState extends State<Detail> {
   List<Map<String, dynamic>> sinop4;
   List<Map<String, dynamic>> sinop5;
   List<Map<String, dynamic>> views;
+  List<Map<String, dynamic>> rating;
   var panjang, isi, idd;
   Preference hurl, hcap;
   Preference hid;
@@ -113,6 +116,9 @@ class _DetailState extends State<Detail> {
           "div.bigcontent > div.infox > div.wd-full > span.mgen > a ",
           ['href']);
       komentar = scraper.getElement("div.torang > a ", ['href']);
+      rating = scraper.getElement(
+          "div.bigcontent > div.thumbook > div.rt > div.rating > div.rating-prc > div.num",
+          []);
 
       id = scraper.getElement("article", ['id']);
 
@@ -187,6 +193,47 @@ class _DetailState extends State<Detail> {
     return moderead;
   }
 
+  final BannerAd myBanner = BannerAd(
+    adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+    size: AdSize.banner,
+    request: AdRequest(),
+    listener: BannerAdListener(),
+  );
+
+  InterstitialAd _interstitialAd;
+
+  void ads2() {
+    InterstitialAd.load(
+        adUnitId: 'ca-app-pub-2816272273438312/8202383214',
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            // Keep a reference to the ad so you can show it later.
+            this._interstitialAd = ad;
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            print('InterstitialAd failed to load: $error');
+          },
+        ));
+  }
+
+  RewardedAd _rewardedAd;
+  void ads3() {
+    RewardedAd.load(
+        adUnitId: 'ca-app-pub-2816272273438312/4626649027',
+        request: AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (RewardedAd ad) {
+            print('$ad loaded.');
+            // Keep a reference to the ad so you can show it later.
+            this._rewardedAd = ad;
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            print('RewardedAd failed to load: $error');
+          },
+        ));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -196,749 +243,777 @@ class _DetailState extends State<Detail> {
       fetchInfo();
     });
     cekRead();
+    if (widget.ads == 2) ads3();
+    ads2();
+    myBanner.load();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd.dispose();
+    _rewardedAd.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
+   
     Size screensize = MediaQuery.of(context).size;
     var cek = Hive.box('idbookmark');
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Const.baseColor,
-        title: Text('Detail Manga'),
-      ),
-      body: load
-          ? Container(
-              width: double.infinity,
-              height: screensize.height,
-              decoration: BoxDecoration(
-                  color: Color.fromRGBO(22, 21, 29, 1),
-                  image: DecorationImage(
-                      image: NetworkImage(widget.gambar), fit: BoxFit.fill)),
-              child: Stack(
-                children: [
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: _sigmaX, sigmaY: _sigmaY),
-                    child: Container(
-                      color: Const.baseColor.withOpacity(_opacity),
+        appBar: AppBar(
+          backgroundColor: Const.baseColor,
+          title: Text('Detail Manga'),
+        ),
+        body: load
+            ? Container(
+                width: double.infinity,
+                height: screensize.height,
+                decoration: BoxDecoration(
+                    color: Color.fromRGBO(22, 21, 29, 1),
+                    image: DecorationImage(
+                        image: NetworkImage(widget.gambar), fit: BoxFit.fill)),
+                child: Stack(
+                  children: [
+                    BackdropFilter(
+                      filter:
+                          ImageFilter.blur(sigmaX: _sigmaX, sigmaY: _sigmaY),
+                      child: Container(
+                        color: Const.baseColor.withOpacity(_opacity),
+                      ),
                     ),
-                  ),
-                  SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width *
-                                      32 /
-                                      100,
-                                  height: 180,
-                                  child: Image.network(
-                                    widget.gambar,
-                                    fit: BoxFit.fill,
-                                    loadingBuilder:
-                                        (context, child, loadingprogress) {
-                                      if (loadingprogress == null) return child;
-                                      return Container(
-                                        decoration:
-                                            BoxDecoration(color: Colors.grey),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                32 /
-                                                100,
-                                        height: 150,
-                                        child: Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width *
-                                      60 /
-                                      100,
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.2),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(6))),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(15),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          widget.nama,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16),
-                                        ),
-                                        (cek.get(idd) != idd)
-                                            ? GestureDetector(
-                                                onTap: () async {
-                                                  bookmark();
-                                                  setState(() {
-                                                    cek.get(idd);
-                                                  });
-                                                },
-                                                child: AnimatedContainer(
-                                                    height: 40,
-                                                    duration: Duration(
-                                                        milliseconds: 800),
-                                                    color: Colors.redAccent,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.favorite,
-                                                          color: Colors.white,
-                                                          size: 20,
-                                                        ),
-                                                        Text(
-                                                          "Bookmark",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        )
-                                                      ],
-                                                    )),
-                                              )
-                                            : GestureDetector(
-                                                onTap: () async {
-                                                  delbookmark();
-                                                  setState(() {
-                                                    cek.get(idd);
-                                                  });
-                                                },
-                                                child: AnimatedContainer(
-                                                    height: 40,
-                                                    duration: Duration(
-                                                        milliseconds: 800),
-                                                    color: Colors.greenAccent,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.favorite,
-                                                          color: Colors.white,
-                                                          size: 20,
-                                                        ),
-                                                        Text(
-                                                          "Bookmarked",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        )
-                                                      ],
-                                                    )),
-                                              )
-                                      ],
+                    SingleChildScrollView(
+                        physics: BouncingScrollPhysics(),
+                        child: Padding(
+                          padding:
+                              EdgeInsets.only(left: 10, right: 10, top: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        32 /
+                                        100,
+                                    height: 200,
+                                    child: Image.network(
+                                      widget.gambar,
+                                      fit: BoxFit.fill,
+                                      loadingBuilder:
+                                          (context, child, loadingprogress) {
+                                        if (loadingprogress == null)
+                                          return child;
+                                        return Container(
+                                          decoration:
+                                              BoxDecoration(color: Colors.grey),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              32 /
+                                              100,
+                                          height: 150,
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(34, 34, 34, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6))),
-                              child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      jalt[0]['title'].toString().trim(),
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: Text(
-                                        "Tahun Rilis : " +
-                                            rilis[0]['attributes']['title']
-                                                .toString()
-                                                .trim(),
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: Text(
-                                        "Status : " +
-                                            status[0]['attributes']['title']
-                                                .toString()
-                                                .trim(),
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: Text(
-                                        "Author : " +
-                                            rilis[1]['attributes']['title']
-                                                .toString()
-                                                .trim(),
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: Text(
-                                        "Last Update : " + lastup[0]['title'],
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: Text(
-                                        "Posted By : " +
-                                            rilis[5]['attributes']['title']
-                                                .toString()
-                                                .trim(),
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 4, bottom: 4),
-                                      child: (views.length < 7)
-                                          ? Text(
-                                              "Views : " +
-                                                  views[4]['title']
-                                                      .toString()
-                                                      .trim(),
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 14),
-                                            )
-                                          : Text(
-                                              "Views : " +
-                                                  views[6]['title']
-                                                      .toString()
-                                                      .trim(),
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 14),
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(34, 34, 34, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6))),
-                              child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: (sinop.length > 1)
-                                    ? Column(
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        60 /
+                                        100,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.2),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(6))),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(15),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            "SINOPSIS",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                widget.nama,
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                              SizedBox(
+                                                height: 15,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  GFRating(
+                                                    color: Colors.red,
+                                                    borderColor: Colors.red,
+                                                    size: 25,
+                                                    allowHalfRating: true,
+                                                    value: double.parse(
+                                                            rating[0]
+                                                                ['title']) /
+                                                        2.0,
+                                                    onChanged: (value) {},
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Text(
+                                                    rating[0]['title']
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16),
+                                                  )
+                                                ],
+                                              ),
+                                            ],
                                           ),
-                                          Divider(
+                                          (cek.get(idd) != idd)
+                                              ? GestureDetector(
+                                                  onTap: () async {
+                                                    bookmark();
+                                                    setState(() {
+                                                      cek.get(idd);
+                                                    });
+                                                  },
+                                                  child: AnimatedContainer(
+                                                      height: 40,
+                                                      duration: Duration(
+                                                          milliseconds: 800),
+                                                      color: Colors.redAccent,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.favorite,
+                                                            color: Colors.white,
+                                                            size: 20,
+                                                          ),
+                                                          Text(
+                                                            "Bookmark",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        ],
+                                                      )),
+                                                )
+                                              : GestureDetector(
+                                                  onTap: () async {
+                                                    delbookmark();
+                                                    setState(() {
+                                                      cek.get(idd);
+                                                    });
+                                                  },
+                                                  child: AnimatedContainer(
+                                                      height: 40,
+                                                      duration: Duration(
+                                                          milliseconds: 800),
+                                                      color: Colors.greenAccent,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.favorite,
+                                                            color: Colors.white,
+                                                            size: 20,
+                                                          ),
+                                                          Text(
+                                                            "Bookmarked",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        ],
+                                                      )),
+                                                )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(34, 34, 34, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        jalt[0]['title'].toString().trim(),
+                                        style: TextStyle(
                                             color: Colors.grey,
-                                          ),
-                                          for (var i = 0; i < sinop.length; i++)
-                                            Text(
-                                              sinop[i]['title']
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(
+                                        color: Colors.grey,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
+                                        child: Text(
+                                          "Tahun Rilis : " +
+                                              rilis[0]['attributes']['title']
                                                   .toString()
                                                   .trim(),
-                                              style: GoogleFonts.archivoNarrow(
-                                                  textStyle: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      fontSize: 14)),
-                                            ),
-                                        ],
-                                      )
-                                    : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "SINOPSIS",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Divider(
-                                            color: Colors.grey,
-                                          ),
-                                          for (var i = 0; i < panjang; i++)
-                                            Text(
-                                              isi[i]['title'].toString().trim(),
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 14),
-                                            ),
-                                        ],
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14),
+                                        ),
                                       ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(34, 34, 34, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6))),
-                              child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "GENRE",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey,
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Wrap(children: [
-                                          for (var i = 0; i < genre.length; i++)
-                                            Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 0,
-                                                    right: 5,
-                                                    bottom: 6),
-                                                child: GestureDetector(
-                                                  child: Container(
-                                                      decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .transparent,
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          4)),
-                                                          border: Border.all(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 0.5)),
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Text(
-                                                          genre[i]['title']
-                                                              .toString()
-                                                              .trim(),
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                      )),
-                                                  onTap: () {
-                                                    Get.to(
-                                                        () => Detgen(
-                                                            url: linkgenre[i][
-                                                                    'attributes']
-                                                                ['href'],
-                                                            nama: genre[i]
-                                                                ['title']),
-                                                        transition:
-                                                            Transition.zoom);
-                                                  },
-                                                )),
-                                        ])
-                                      ],
-                                    )
-                                  ],
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
+                                        child: Text(
+                                          "Status : " +
+                                              status[0]['attributes']['title']
+                                                  .toString()
+                                                  .trim(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
+                                        child: Text(
+                                          "Author : " +
+                                              rilis[1]['attributes']['title']
+                                                  .toString()
+                                                  .trim(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
+                                        child: Text(
+                                          "Last Update : " + lastup[0]['title'],
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
+                                        child: Text(
+                                          "Posted By : " +
+                                              rilis[5]['attributes']['title']
+                                                  .toString()
+                                                  .trim(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
+                                        child: (views.length < 7)
+                                            ? Text(
+                                                "Views : " +
+                                                    views[4]['title']
+                                                        .toString()
+                                                        .trim(),
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 14),
+                                              )
+                                            : Text(
+                                                "Views : " +
+                                                    views[6]['title']
+                                                        .toString()
+                                                        .trim(),
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 14),
+                                              ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(34, 34, 34, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6))),
-                              child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "RECENT READ",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey,
-                                    ),
-                                    Container(
-                                        width: double.infinity,
-                                        height: 45,
-                                        child: GestureDetector(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 0, right: 5, bottom: 15),
-                                            child: Container(
-                                                height: 25,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide(
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(34, 34, 34, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: (sinop.length > 1)
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "SINOPSIS",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Divider(
+                                              color: Colors.grey,
+                                            ),
+                                            for (var i = 0;
+                                                i < sinop.length;
+                                                i++)
+                                              Text(
+                                                sinop[i]['title']
+                                                    .toString()
+                                                    .trim(),
+                                                style:
+                                                    GoogleFonts.archivoNarrow(
+                                                        textStyle: TextStyle(
                                                             color: Colors.grey,
-                                                            width: 1))),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(0),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      PreferenceBuilder<String>(
-                                                          preference: hcap,
-                                                          builder: (BuildContext
-                                                                      context,
-                                                                  String
-                                                                      snapshot) =>
-                                                              Text(
-                                                                snapshot
-                                                                    .toString(),
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal),
-                                                              ))
-                                                    ],
-                                                  ),
-                                                )),
-                                          ),
-                                          onTap: () {
-                                            Get.to(
-                                                () => PreferenceBuilder<int>(
-                                                    preference: hurut,
-                                                    builder:
-                                                        (BuildContext context,
-                                                                int hurutt) =>
-                                                            PreferenceBuilder<
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                            fontSize: 14)),
+                                              ),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "SINOPSIS",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Divider(
+                                              color: Colors.grey,
+                                            ),
+                                            for (var i = 0; i < panjang; i++)
+                                              Text(
+                                                isi[i]['title']
+                                                    .toString()
+                                                    .trim(),
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 14),
+                                              ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(34, 34, 34, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "GENRE",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(
+                                        color: Colors.grey,
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Wrap(children: [
+                                            for (var i = 0;
+                                                i < genre.length;
+                                                i++)
+                                              Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 0,
+                                                          right: 5,
+                                                          bottom: 6),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                        decoration: BoxDecoration(
+                                                            color: Colors
+                                                                .transparent,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            4)),
+                                                            border: Border.all(
+                                                                color:
+                                                                    Colors.grey,
+                                                                width: 0.5)),
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(5),
+                                                          child: Text(
+                                                            genre[i]['title']
+                                                                .toString()
+                                                                .trim(),
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        )),
+                                                    onTap: () {
+                                                      Get.to(
+                                                          () => Detgen(
+                                                              url: linkgenre[i][
+                                                                      'attributes']
+                                                                  ['href'],
+                                                              nama: genre[i]
+                                                                  ['title']),
+                                                          transition:
+                                                              Transition.zoom);
+                                                    },
+                                                  )),
+                                          ])
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(34, 34, 34, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "RECENT READ",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(
+                                        color: Colors.grey,
+                                      ),
+                                      Container(
+                                          width: double.infinity,
+                                          height: 45,
+                                          child: GestureDetector(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 5,
+                                                  bottom: 15),
+                                              child: Container(
+                                                  height: 25,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                      border: Border(
+                                                          bottom: BorderSide(
+                                                              color:
+                                                                  Colors.grey,
+                                                              width: 1))),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.all(0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        PreferenceBuilder<
                                                                 String>(
-                                                              preference: hurl,
-                                                              builder: (BuildContext
-                                                                          context,
-                                                                      String
-                                                                          hurll) =>
-                                                                  PreferenceBuilder<
-                                                                      String>(
-                                                                preference: hid,
+                                                            preference: hcap,
+                                                            builder: (BuildContext
+                                                                        context,
+                                                                    String
+                                                                        snapshot) =>
+                                                                Text(
+                                                                  snapshot
+                                                                      .toString(),
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal),
+                                                                ))
+                                                      ],
+                                                    ),
+                                                  )),
+                                            ),
+                                            onTap: () async {
+                                              if (widget.ads == 1)
+                                                await _interstitialAd.show();
+                                              if (widget.ads == 2) {
+                                                await _rewardedAd.show(
+                                                    onUserEarnedReward:
+                                                        (RewardedAd ad,
+                                                            RewardItem
+                                                                rewardItem) {});
+                                              }
+                                              Get.to(
+                                                  () => PreferenceBuilder<int>(
+                                                      preference: hurut,
+                                                      builder:
+                                                          (BuildContext context,
+                                                                  int hurutt) =>
+                                                              PreferenceBuilder<
+                                                                  String>(
+                                                                preference:
+                                                                    hurl,
                                                                 builder: (BuildContext
                                                                             context,
                                                                         String
-                                                                            hidd) =>
-                                                                    (hurll != "null" ||
-                                                                            hurll !=
-                                                                                null)
-                                                                        ? Read(
-                                                                            link:
-                                                                                hurll,
-                                                                            linkkomik:
-                                                                                widget.lnk,
-                                                                            urut:
-                                                                                hurutt,
-                                                                            id: hidd,
-                                                                            linkdet:
-                                                                                widget.lnk,
-                                                                            namakom:
-                                                                                widget.nama,
-                                                                            img:
-                                                                                widget.gambar,
-                                                                          )
-                                                                        : NullPage(),
-                                                              ),
-                                                            )),
-                                                transition: Transition.zoom);
-                                          },
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(34, 34, 34, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6))),
-                              child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "LIST CHAPTER",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                        width: double.infinity,
-                                        height: 200,
-                                        child: ListView(
-                                          physics: ClampingScrollPhysics(),
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Wrap(children: [
-                                                  for (var i = 0;
-                                                      i < list.length;
-                                                      i++)
-                                                    GestureDetector(
-                                                      child: Chapter(
-                                                          chap:
-                                                              list[i]['attributes']
-                                                                      ['title']
-                                                                  .toString()
-                                                                  .trim(),
-                                                          timech: chtime[i]
-                                                              ['title']),
-                                                      onTap: () {
-                                                        Get.to(
-                                                            () => (moderead ==
-                                                                    1)
-                                                                ? Read(
-                                                                    link: linkch[i]
-                                                                            [
-                                                                            'attributes']
-                                                                        [
-                                                                        'href'],
-                                                                    linkkomik:
-                                                                        widget
-                                                                            .lnk,
-                                                                    urut: i,
-                                                                    id: id[0][
-                                                                            'attributes']
-                                                                        ['id'],
-                                                                    linkdet:
-                                                                        widget
-                                                                            .lnk,
-                                                                    namakom:
-                                                                        widget
-                                                                            .nama,
-                                                                    img: widget
-                                                                        .gambar,
-                                                                  )
-                                                                : (moderead ==
-                                                                        2)
-                                                                    ? WebView(
-                                                                        lnk: linkch[i]['attributes']
-                                                                            [
-                                                                            'href'],
-                                                                      )
-                                                                    : Mode3(
-                                                                        link: linkch[i]['attributes']
-                                                                            [
-                                                                            'href'],
-                                                                        linkkomik:
-                                                                            widget.lnk,
-                                                                        urut: i,
-                                                                        id: id[0]['attributes']
-                                                                            [
-                                                                            'id'],
-                                                                        linkdet:
-                                                                            widget.lnk,
-                                                                        namakom:
-                                                                            widget.nama,
-                                                                        img: widget
-                                                                            .gambar,
-                                                                      ),
-                                                            transition:
-                                                                Transition
-                                                                    .zoom);
-                                                      },
-                                                    )
-                                                ])
-                                              ],
-                                            ),
-                                          ],
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(34, 34, 34, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6))),
-                              child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "KOMENTAR",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                      width: double.infinity,
-                                      child: FlatButton(
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                                PageTransition(
-                                                    type:
-                                                        PageTransitionType.fade,
-                                                    child: Komen(
-                                                      lnk: komentar[0]
-                                                              ['attributes']
-                                                          ['href'],
-                                                    )));
-                                          },
-                                          color: Colors.red,
-                                          child: Text(
-                                            "Komentar",
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                                                            hurll) =>
+                                                                    PreferenceBuilder<
+                                                                        String>(
+                                                                  preference:
+                                                                      hid,
+                                                                  builder: (BuildContext
+                                                                              context,
+                                                                          String
+                                                                              hidd) =>
+                                                                      (hurll != "null" ||
+                                                                              hurll != null)
+                                                                          ? Read(
+                                                                              link: hurll,
+                                                                              linkkomik: widget.lnk,
+                                                                              urut: hurutt,
+                                                                              id: hidd,
+                                                                              linkdet: widget.lnk,
+                                                                              namakom: widget.nama,
+                                                                              img: widget.gambar,
+                                                                            )
+                                                                          : NullPage(),
+                                                                ),
+                                                              )),
+                                                  transition: Transition.zoom);
+                                            },
                                           )),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
-              ),
-            )
-          : Stack(
-              children: [
-                Container(
-                    width: double.infinity,
-                    height: screensize.height,
-                    decoration: BoxDecoration(color: Const.bgcolor),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Const.text2),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(34, 34, 34, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "LIST CHAPTER",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                          width: double.infinity,
+                                          height: 200,
+                                          child: ListView(
+                                            physics: ClampingScrollPhysics(),
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Wrap(children: [
+                                                    for (var i = 0;
+                                                        i < list.length;
+                                                        i++)
+                                                      GestureDetector(
+                                                        child: Chapter(
+                                                            chap: list[i][
+                                                                        'attributes']
+                                                                    ['title']
+                                                                .toString()
+                                                                .trim(),
+                                                            timech: chtime[i]
+                                                                ['title']),
+                                                        onTap: () async {
+                                                          if (widget.ads == 1)
+                                                            await _interstitialAd
+                                                                .show();
+                                                          if (widget.ads == 2) {
+                                                            await _rewardedAd.show(
+                                                                onUserEarnedReward:
+                                                                    (RewardedAd
+                                                                            ad,
+                                                                        RewardItem
+                                                                            rewardItem) {});
+                                                          }
+                                                          Get.to(() => Read(
+                                                                link: linkch[i][
+                                                                        'attributes']
+                                                                    ['href'],
+                                                                linkkomik:
+                                                                    widget.lnk,
+                                                                urut: i,
+                                                                id: id[0][
+                                                                        'attributes']
+                                                                    ['id'],
+                                                                linkdet:
+                                                                    widget.lnk,
+                                                                namakom:
+                                                                    widget.nama,
+                                                                img: widget
+                                                                    .gambar,
+                                                              ));
+                                                        },
+                                                      )
+                                                  ])
+                                                ],
+                                              ),
+                                            ],
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(34, 34, 34, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "KOMENTAR",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        width: double.infinity,
+                                        child: FlatButton(
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                  PageTransition(
+                                                      type: PageTransitionType
+                                                          .fade,
+                                                      child: Komen(
+                                                        lnk: komentar[0]
+                                                                ['attributes']
+                                                            ['href'],
+                                                      )));
+                                            },
+                                            color: Colors.red,
+                                            child: Text(
+                                              "Komentar",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            "Loading...",
-                            style: TextStyle(fontSize: 18, color: Const.text2),
-                          )
-                        ],
-                      ),
-                    ))
-              ],
-            ),
-    );
+                        )),
+                  ],
+                ),
+              )
+            : loadingScreen(screensize));
   }
 }

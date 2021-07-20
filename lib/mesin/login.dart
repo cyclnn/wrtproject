@@ -2,14 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:wrtproject/mesin/database.dart';
 import 'package:wrtproject/mesin/register.dart';
-import 'package:wrtproject/screen/Home/home.dart';
 import 'package:get/get.dart';
-import 'package:wrtproject/wrapper.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,11 +101,8 @@ class LoginScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     try {
-                      auth
-                          .signInWithEmailAndPassword(
-                              email: _email.text, password: _password.text)
-                          .then((value) => Get.to(() => Home(),
-                              transition: Transition.downToUp));
+                      auth.signInWithEmailAndPassword(
+                          email: _email.text, password: _password.text);
                     } on FirebaseAuthException catch (e) {
                       Alert(context: context, title: "Error", desc: e.message)
                           .show();
@@ -106,12 +121,11 @@ class LoginScreen extends StatelessWidget {
                   child: Container(
                     color: Colors.redAccent,
                     child: new TextButton.icon(
-                        onPressed: () {
-                          Alert(
-                                  context: context,
-                                  title: "Ooopss",
-                                  desc: "Metode Login Ini Sedang Dikerjakan")
-                              .show();
+                        onPressed: () async {
+                          signInWithGoogle().then((value) =>
+                              Daftar.createOrupdate(
+                                  auth.currentUser.email.toString(),
+                                  jenis: "1"));
                         },
                         icon: Icon(
                           MdiIcons.google,

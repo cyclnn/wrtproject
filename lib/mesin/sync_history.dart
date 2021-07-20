@@ -6,11 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 FirebaseAuth user = FirebaseAuth.instance;
 
 class Syncron {
-  static CollectionReference data =
-      FirebaseFirestore.instance.collection(user.currentUser.email);
-
-  static Future<void> addHistory() async {
-    bool jj = false;
+  static Future addHistory() async {
+    CollectionReference data =
+        FirebaseFirestore.instance.collection(user.currentUser.email);
     var legt;
     await Hive.openBox('title');
     await Hive.openBox('gambar');
@@ -20,7 +18,7 @@ class Syncron {
     var url = Hive.box('url');
     var gambar = Hive.box('gambar');
     var id = Hive.box('idbookmark');
-    legt = title.length;
+    legt = id.length;
 
     for (var i = 0; i < legt; i++) {
       if (data.doc("history" + i.toString()) != null) {
@@ -35,25 +33,32 @@ class Syncron {
       await data.doc("historylength").set({"length": i});
     }
 
+    print(user.currentUser.email);
     saveReadMode();
-    return jj = true;
   }
 
   static Future<void> saveReadMode() async {
+    CollectionReference data =
+        FirebaseFirestore.instance.collection(user.currentUser.email);
+
     SharedPreferences mode = await SharedPreferences.getInstance();
 
     await data.doc("settings").set({"readmode": mode.getInt("readmode")});
   }
 
   static Future<void> restoreReadMode() async {
+    CollectionReference data =
+        FirebaseFirestore.instance.collection(user.currentUser.email);
     SharedPreferences mode = await SharedPreferences.getInstance();
 
     await data.doc("settings").set({"readmode": mode.getInt("readmode")});
   }
 
-  static Future<void> restoreHistory() async {
+  static Future restoreHistory() async {
+    CollectionReference data =
+        FirebaseFirestore.instance.collection(user.currentUser.email);
     SharedPreferences mode = await SharedPreferences.getInstance();
-    var legt;
+    var legt, status;
     dynamic legt2;
     dynamic bookmark;
     dynamic read;
@@ -61,6 +66,7 @@ class Syncron {
     await Hive.openBox('title');
     await Hive.openBox('gambar');
     await Hive.openBox('url');
+    await Hive.openBox('idbookmark');
 
     var title = Hive.box('title');
     var url = Hive.box('url');
@@ -79,19 +85,27 @@ class Syncron {
       gambar.deleteAt(j);
       id.deleteAt(j);
     }
-    for (var i = 0; i < legt2['length'] + 1; i++) {
-      await data
-          .doc("history" + i.toString())
-          .get()
-          .then<dynamic>((DocumentSnapshot value) async {
-        bookmark = value.data();
-      });
 
-      title.add(bookmark['title']);
-      url.add(bookmark['link']);
-      gambar.add(bookmark['img']);
-      id.add(bookmark['id']);
+    if (legt2 != null) {
+      for (var i = 0; i < legt2['length'] + 1; i++) {
+        await data
+            .doc("history" + i.toString())
+            .get()
+            .then<dynamic>((DocumentSnapshot value) async {
+          bookmark = value.data();
+        });
+
+        title.add(bookmark['title']);
+        url.add(bookmark['link']);
+        gambar.add(bookmark['img']);
+        id.put(bookmark['id'], bookmark['id']);
+      }
+      status = 1;
+    } else {
+      status = 0;
+      return status;
     }
+
     await data
         .doc("settings")
         .get()
@@ -100,5 +114,6 @@ class Syncron {
     });
 
     await mode.setInt("readmode", read['readmode']);
+    return status;
   }
 }
