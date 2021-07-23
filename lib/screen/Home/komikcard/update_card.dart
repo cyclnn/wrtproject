@@ -19,7 +19,7 @@ updateCard(
   InterstitialAd _interstitialAd;
   if (ads == 1) {
     InterstitialAd.load(
-        adUnitId: 'ca-app-pub-2816272273438312/9899635930',
+        adUnitId: Const.ins2,
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
@@ -27,7 +27,6 @@ updateCard(
             _interstitialAd = ad;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            print('InterstitialAd failed to load: $error');
           },
         ));
   }
@@ -94,14 +93,16 @@ updateCard(
                                     ch: chlist[i]['attributes']['title'],
                                   ),
                         onTap: () async {
-                          if (ads == 1) await _interstitialAd.show();
+                         
                           Get.to(
                               () => Detail(
                                   lnk: linkup[i]['attributes']['href'],
                                   ads: ads2,
                                   gambar: komiklist[i]['attributes']['src'],
                                   nama: namalist[i]['attributes']['title']),
-                              transition: Transition.downToUp);
+                              transition: Transition.downToUp).then((value) {
+                                 if (ads == 1)  _interstitialAd.show();
+                              });
                         },
                         onLongPress: () {},
                       ),

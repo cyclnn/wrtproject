@@ -11,6 +11,11 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:wrtproject/screen/loading/loading.dart';
 import 'package:wrtproject/screen/read/native.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wrtproject/screen/read/simpel.dart';
+import 'package:wrtproject/screen/read/webview.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:get/get.dart';
 
 class Read extends StatefulWidget {
   final String link, linkkomik, namakom, linkdet, img, id;
@@ -164,11 +169,7 @@ class _ReadState extends State<Read> {
                           onRefresh: _onRefresh,
                           child: nativeRead(panjang, url, blogger))
                       : (moderead == 2)
-                          ? SmartRefresher(
-                              controller: _refreshController,
-                              enablePullDown: true,
-                              onRefresh: _onRefresh,
-                              child: nativeRead(panjang, url, blogger))
+                          ? webview()
                           : SmartRefresher(
                               controller: _refreshController,
                               enablePullDown: true,
@@ -178,8 +179,37 @@ class _ReadState extends State<Read> {
         : loadingScreen(screensize);
   }
 
-  // Modal Bottom
+  webview() {
+    return Stack(children: [
+      WebView(
+        initialUrl: widget.link,
+        javascriptMode: JavascriptMode.unrestricted,
+        onProgress: (int progress) {
+          loading(progress);
+        },
+        navigationDelegate: (NavigationRequest request) {
+          if (request.url.startsWith('https://wrt.my.id/')) {
+            return NavigationDecision.prevent;
+          }
+          if (request.url.startsWith('https://syndication.exdynsrv.com')) {
+            return NavigationDecision.prevent;
+          }
+          if (request.url.startsWith('https://disqus.com')) {
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+        gestureNavigationEnabled: false,
+      ),
+      GestureDetector(
+        onTap: () {
+          modalBottom(widget.img);
+        },
+      )
+    ]);
+  }
 
+  // Modal Bottom
   modalBottom(String gbr) {
     return showModalBottomSheet(
         context: context,

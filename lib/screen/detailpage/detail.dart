@@ -194,7 +194,7 @@ class _DetailState extends State<Detail> {
   }
 
   final BannerAd myBanner = BannerAd(
-    adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+    adUnitId: Const.banner1,
     size: AdSize.banner,
     request: AdRequest(),
     listener: BannerAdListener(),
@@ -204,33 +204,28 @@ class _DetailState extends State<Detail> {
 
   void ads2() {
     InterstitialAd.load(
-        adUnitId: 'ca-app-pub-2816272273438312/8202383214',
+        adUnitId: Const.ins1,
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
             // Keep a reference to the ad so you can show it later.
             this._interstitialAd = ad;
           },
-          onAdFailedToLoad: (LoadAdError error) {
-            print('InterstitialAd failed to load: $error');
-          },
+          onAdFailedToLoad: (LoadAdError error) {},
         ));
   }
 
   RewardedAd _rewardedAd;
   void ads3() {
     RewardedAd.load(
-        adUnitId: 'ca-app-pub-2816272273438312/4626649027',
+        adUnitId: Const.rewarded1,
         request: AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
-            print('$ad loaded.');
             // Keep a reference to the ad so you can show it later.
             this._rewardedAd = ad;
           },
-          onAdFailedToLoad: (LoadAdError error) {
-            print('RewardedAd failed to load: $error');
-          },
+          onAdFailedToLoad: (LoadAdError error) {},
         ));
   }
 
@@ -257,8 +252,6 @@ class _DetailState extends State<Detail> {
 
   @override
   Widget build(BuildContext context) {
-
-   
     Size screensize = MediaQuery.of(context).size;
     var cek = Hive.box('idbookmark');
     return Scaffold(
@@ -806,20 +799,12 @@ class _DetailState extends State<Detail> {
                                                   )),
                                             ),
                                             onTap: () async {
-                                              if (widget.ads == 1)
-                                                await _interstitialAd.show();
-                                              if (widget.ads == 2) {
-                                                await _rewardedAd.show(
-                                                    onUserEarnedReward:
-                                                        (RewardedAd ad,
-                                                            RewardItem
-                                                                rewardItem) {});
-                                              }
                                               Get.to(
-                                                  () => PreferenceBuilder<int>(
-                                                      preference: hurut,
-                                                      builder:
-                                                          (BuildContext context,
+                                                      () => PreferenceBuilder<
+                                                              int>(
+                                                          preference: hurut,
+                                                          builder: (BuildContext
+                                                                      context,
                                                                   int hurutt) =>
                                                               PreferenceBuilder<
                                                                   String>(
@@ -851,7 +836,19 @@ class _DetailState extends State<Detail> {
                                                                           : NullPage(),
                                                                 ),
                                                               )),
-                                                  transition: Transition.zoom);
+                                                      transition:
+                                                          Transition.zoom)
+                                                  .then((value) {
+                                                if (widget.ads == 1)
+                                                  _interstitialAd.show();
+                                                if (widget.ads == 2) {
+                                                  _rewardedAd.show(
+                                                      onUserEarnedReward:
+                                                          (RewardedAd ad,
+                                                              RewardItem
+                                                                  rewardItem) {});
+                                                }
+                                              });
                                             },
                                           )),
                                     ],
@@ -910,17 +907,6 @@ class _DetailState extends State<Detail> {
                                                             timech: chtime[i]
                                                                 ['title']),
                                                         onTap: () async {
-                                                          if (widget.ads == 1)
-                                                            await _interstitialAd
-                                                                .show();
-                                                          if (widget.ads == 2) {
-                                                            await _rewardedAd.show(
-                                                                onUserEarnedReward:
-                                                                    (RewardedAd
-                                                                            ad,
-                                                                        RewardItem
-                                                                            rewardItem) {});
-                                                          }
                                                           Get.to(() => Read(
                                                                 link: linkch[i][
                                                                         'attributes']
@@ -937,7 +923,20 @@ class _DetailState extends State<Detail> {
                                                                     widget.nama,
                                                                 img: widget
                                                                     .gambar,
-                                                              ));
+                                                              )).then((value) {
+                                                            if (widget.ads == 1)
+                                                              _interstitialAd
+                                                                  .show();
+                                                            if (widget.ads ==
+                                                                2) {
+                                                              _rewardedAd.show(
+                                                                  onUserEarnedReward:
+                                                                      (RewardedAd
+                                                                              ad,
+                                                                          RewardItem
+                                                                              rewardItem) {});
+                                                            }
+                                                          });
                                                         },
                                                       )
                                                   ])

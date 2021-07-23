@@ -7,6 +7,7 @@ nativeRead(
   List<Map<String, dynamic>> url,
   List<Map<String, dynamic>> blogger,
 ) {
+  Map<String, String> header = {"referer": "https://wrt.my.id"};
   return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       child: (url != blogger)
@@ -19,6 +20,7 @@ nativeRead(
                     width: double.infinity,
                     child: Center(
                       child: CachedNetworkImage(
+                        httpHeaders: header,
                         imageUrl: url[i]['attributes']['src'],
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) => Container(

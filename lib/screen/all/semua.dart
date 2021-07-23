@@ -53,7 +53,7 @@ class _AllKomState extends State<AllKom> {
   ads() async {
     if (widget.ads3 == 1) {
       await InterstitialAd.load(
-          adUnitId: 'ca-app-pub-2816272273438312/4024299205',
+          adUnitId: Const.ins2,
           request: AdRequest(),
           adLoadCallback: InterstitialAdLoadCallback(
             onAdLoaded: (InterstitialAd ad) {
@@ -61,7 +61,6 @@ class _AllKomState extends State<AllKom> {
               _interstitialAd = ad;
             },
             onAdFailedToLoad: (LoadAdError error) {
-              print('InterstitialAd failed to load: $error');
             },
           ));
     }

@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/all/all.dart';
 import 'package:wrtproject/screen/bookmark/bookmark.dart';
@@ -8,6 +10,7 @@ import 'package:wrtproject/screen/setting/setting.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -23,7 +26,10 @@ class _HomeState extends State<Home> {
     });
   }
 
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   dynamic legt2;
+  dynamic cekupdate;
   bool load = false;
   CollectionReference data = FirebaseFirestore.instance.collection("Server");
   cek() async {
@@ -33,7 +39,12 @@ class _HomeState extends State<Home> {
         .then<dynamic>((DocumentSnapshot value) async {
       legt2 = value.data();
     });
-
+    await data
+        .doc("Update")
+        .get()
+        .then<dynamic>((DocumentSnapshot value) async {
+      cekupdate = value.data();
+    });
     setState(() {
       load = true;
     });
@@ -53,7 +64,10 @@ class _HomeState extends State<Home> {
       resizeToAvoidBottomInset: false,
       body: (load)
           ? (legt2['status'] == 1)
-              ? tab[navIndex]
+              ? (cekupdate['version'] == Const.version)
+                  ? tab[navIndex]
+                  : updateMode(cekupdate['version'], cekupdate['Message'],
+                      cekupdate['Link'])
               : maintenanceMode("Mohon Maaf Server WRT Sedang Maintenance")
           : maintenanceMode("Loading..."),
       bottomNavigationBar: SizedBox(
@@ -99,4 +113,38 @@ class _HomeState extends State<Home> {
           ),
         ));
   }
+}
+
+updateMode(String title, message, link) {
+  return Container(
+      color: Const.bgcolor,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("New Update Versi " + title,
+                style: GoogleFonts.chakraPetch(
+                    textStyle:
+                        TextStyle(fontSize: 25, fontWeight: FontWeight.bold))),
+            SizedBox(
+              height: 50,
+            ),
+            Container(
+              width: 250,
+              child: Text(message,
+                  style:
+                      GoogleFonts.roboto(textStyle: TextStyle(fontSize: 18))),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            ElevatedButton.icon(
+                onPressed: () {
+                  launch(link);
+                },
+                icon: Icon(Icons.update),
+                label: Text("Update Sekarang"))
+          ],
+        ),
+      ));
 }

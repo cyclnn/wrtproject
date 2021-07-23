@@ -104,8 +104,23 @@ class LoginScreen extends StatelessWidget {
                       auth.signInWithEmailAndPassword(
                           email: _email.text, password: _password.text);
                     } on FirebaseAuthException catch (e) {
-                      Alert(context: context, title: "Error", desc: e.message)
-                          .show();
+                      Alert(
+                        context: context,
+                        type: AlertType.error,
+                        title: "Gagal Login",
+                        desc: e.message,
+                        buttons: [
+                          DialogButton(
+                            child: Text(
+                              "Oke",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                            onPressed: () => Get.back(),
+                            width: 120,
+                          )
+                        ],
+                      ).show();
                     }
                   },
                 ),

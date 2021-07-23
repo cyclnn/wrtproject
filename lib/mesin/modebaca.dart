@@ -4,7 +4,7 @@ changeReadMode(int nilai) async {
   SharedPreferences mode = await SharedPreferences.getInstance();
 
   mode.setInt("readmode", nilai);
-  return print(mode.getInt("readmode"));
+  return mode.getInt("readmode");
 }
 
 getReadMode() async {
@@ -12,7 +12,7 @@ getReadMode() async {
   SharedPreferences mode = await SharedPreferences.getInstance();
 
   hasil = mode.getInt("readmode");
-  return print(hasil);
+  return hasil;
 }
 
 cekReadMode() async {
