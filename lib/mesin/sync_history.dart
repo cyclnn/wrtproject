@@ -33,7 +33,6 @@ class Syncron {
       await data.doc("historylength").set({"length": i});
     }
 
-    print(user.currentUser.email);
     saveReadMode();
   }
 

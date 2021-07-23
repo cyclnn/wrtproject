@@ -10,7 +10,6 @@ class AuthServices {
       User user = result.user;
       return user;
     } on FirebaseAuthException {
-      print('e.message');
     }
   }
 
@@ -21,7 +20,6 @@ class AuthServices {
       User user = result.user;
       return user;
     } on FirebaseAuthException catch (e) {
-      print(e.message);
     }
   }
 
@@ -32,7 +30,6 @@ class AuthServices {
       var user = result;
       return user;
     } on FirebaseAuthException catch (e) {
-      print(e.message);
     }
   }
 

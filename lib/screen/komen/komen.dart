@@ -169,7 +169,6 @@ class _KomenState extends State<Komen> {
                       });
                     },
                     onConsoleMessage: (controller, consoleMessage) {
-                      print(consoleMessage);
                     },
                   ),
                   progress < 1.0

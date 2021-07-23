@@ -430,7 +430,7 @@ class _SettingState extends State<Setting> {
                                                                     5),
                                                             child: Center(
                                                               child: Text(
-                                                                "Simpel",
+                                                                "Simpel (Coming Soon)",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         16,
@@ -757,7 +757,7 @@ class _SettingState extends State<Setting> {
                         Padding(
                           padding: const EdgeInsets.only(right: 15),
                           child: Text(
-                            "2.2.0",
+                            Const.version,
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,

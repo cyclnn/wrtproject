@@ -36,7 +36,8 @@ Future<void> initPlatformState() async {
   await data.doc("Ads").get().then<dynamic>((DocumentSnapshot value) async {
     legt2 = value.data();
   });
-  
+
+ 
 
   prefs.setInt("Ads1", legt2['home']);
   prefs.setInt("Ads2", legt2['chapter']);

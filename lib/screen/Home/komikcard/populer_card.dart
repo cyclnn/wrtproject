@@ -17,7 +17,7 @@ populerCard(
   InterstitialAd _interstitialAd;
   if (ads == 1) {
     InterstitialAd.load(
-        adUnitId: 'ca-app-pub-2816272273438312/9899635930',
+        adUnitId: Const.ins2,
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
@@ -25,7 +25,6 @@ populerCard(
             _interstitialAd = ad;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            print('InterstitialAd failed to load: $error');
           },
         ));
   }
@@ -76,7 +75,6 @@ populerCard(
                           chhot: hotch[i]['title'].toString().trim(),
                           rating: double.parse(rating[i]['title'])),
                       onTap: () async {
-                        if (ads == 1) await _interstitialAd.show();
                         Get.to(
                             () => Detail(
                                   lnk: link[i]['attributes']['href'],
@@ -85,7 +83,10 @@ populerCard(
                                   urut: i,
                                   ads: ads2,
                                 ),
-                            transition: Transition.downToUp);
+                            transition: Transition.downToUp).then((value) {
+                                                      if (ads == 1)  _interstitialAd.show();
+
+                            });
                       })
               ],
             ),

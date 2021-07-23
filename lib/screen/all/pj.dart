@@ -48,7 +48,6 @@ class _AllPjState extends State<AllPj> {
 
       setState(() {
         komikLoad = true;
-        print(akhir2);
       });
     }
   }
@@ -57,7 +56,7 @@ class _AllPjState extends State<AllPj> {
   ads() async {
     if (widget.ads3 == 1) {
       await InterstitialAd.load(
-          adUnitId: 'ca-app-pub-2816272273438312/4024299205',
+          adUnitId: Const.ins2,
           request: AdRequest(),
           adLoadCallback: InterstitialAdLoadCallback(
             onAdLoaded: (InterstitialAd ad) {
@@ -65,7 +64,6 @@ class _AllPjState extends State<AllPj> {
               _interstitialAd = ad;
             },
             onAdFailedToLoad: (LoadAdError error) {
-              print('InterstitialAd failed to load: $error');
             },
           ));
     }
@@ -133,16 +131,19 @@ class _AllPjState extends State<AllPj> {
                               ),
                             ),
                             onTap: () async {
-                              if (widget.ads3 == 1)
-                                await _interstitialAd.show();
-                              Navigator.of(context).push(PageTransition(
-                                  type: PageTransitionType.bottomToTop,
-                                  child: Detail(
-                                      lnk: link[i]['attributes']['href'],
-                                      ads: widget.ads3,
-                                      gambar: imgkomik[i]['attributes']['src'],
-                                      nama: namakomik[i]['attributes']
-                                          ['title'])));
+                              Navigator.of(context)
+                                  .push(PageTransition(
+                                      type: PageTransitionType.bottomToTop,
+                                      child: Detail(
+                                          lnk: link[i]['attributes']['href'],
+                                          ads: widget.ads3,
+                                          gambar: imgkomik[i]['attributes']
+                                              ['src'],
+                                          nama: namakomik[i]['attributes']
+                                              ['title'])))
+                                  .then((value) {
+                                if (widget.ads3 == 1) _interstitialAd.show();
+                              });
                             },
                           ),
                         Row(
