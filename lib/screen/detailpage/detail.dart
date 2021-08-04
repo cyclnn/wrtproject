@@ -17,6 +17,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Detail extends StatefulWidget {
   final int ads;
@@ -52,6 +53,7 @@ class _DetailState extends State<Detail> {
   List<Map<String, dynamic>> sinop3;
   List<Map<String, dynamic>> sinop4;
   List<Map<String, dynamic>> sinop5;
+  List<Map<String, dynamic>> sinop6;
   List<Map<String, dynamic>> views;
   List<Map<String, dynamic>> rating;
   var panjang, isi, idd;
@@ -90,6 +92,7 @@ class _DetailState extends State<Detail> {
       sinop2 = scraper.getElement("div.entry-content > p > span", []);
       sinop3 = scraper.getElement("#tw-target-text-container> span", []);
       sinop5 = scraper.getElement("#tw-target-text-container > p > span", []);
+      sinop6 = scraper.getElement(" div.series-synops > p", []);
 
       jalt = scraper
           .getElement("div.bigcontent > div.infox > div.wd-full > span", []);
@@ -144,9 +147,12 @@ class _DetailState extends State<Detail> {
         } else if (sinop4.length > 0) {
           panjang = sinop4.length;
           isi = sinop4;
-        } else {
+        } else if (sinop5.length > 0) {
           panjang = sinop5.length;
           isi = sinop5;
+        } else {
+          panjang = sinop6.length;
+          isi = sinop6;
         }
         load = true;
         get();
@@ -244,14 +250,8 @@ class _DetailState extends State<Detail> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _interstitialAd.dispose();
-    _rewardedAd.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    Map<String, String> header = {"referer": "https://wrt.my.id"};
     Size screensize = MediaQuery.of(context).size;
     var cek = Hive.box('idbookmark');
     return Scaffold(
@@ -263,12 +263,31 @@ class _DetailState extends State<Detail> {
             ? Container(
                 width: double.infinity,
                 height: screensize.height,
-                decoration: BoxDecoration(
-                    color: Color.fromRGBO(22, 21, 29, 1),
-                    image: DecorationImage(
-                        image: NetworkImage(widget.gambar), fit: BoxFit.fill)),
                 child: Stack(
                   children: [
+                    CachedNetworkImage(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      httpHeaders: header,
+                      imageUrl: widget.gambar,
+                      fit: BoxFit.fill,
+                      placeholder: (context, url) => Container(
+                        width: 130,
+                        height: 160,
+                        child: Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.deepPurple),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    ),
                     BackdropFilter(
                       filter:
                           ImageFilter.blur(sigmaX: _sigmaX, sigmaY: _sigmaY),
@@ -293,27 +312,31 @@ class _DetailState extends State<Detail> {
                                         32 /
                                         100,
                                     height: 200,
-                                    child: Image.network(
-                                      widget.gambar,
+                                    child: CachedNetworkImage(
+                                      httpHeaders: header,
+                                      imageUrl: widget.gambar,
                                       fit: BoxFit.fill,
-                                      loadingBuilder:
-                                          (context, child, loadingprogress) {
-                                        if (loadingprogress == null)
-                                          return child;
-                                        return Container(
-                                          decoration:
-                                              BoxDecoration(color: Colors.grey),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              32 /
-                                              100,
-                                          height: 150,
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
+                                      placeholder: (context, url) => Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                32 /
+                                                100,
+                                        height: 200,
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.deepPurple),
+                                              strokeWidth: 2,
+                                            ),
                                           ),
-                                        );
-                                      },
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
                                     ),
                                   ),
                                   Container(
@@ -825,6 +848,7 @@ class _DetailState extends State<Detail> {
                                                                       (hurll != "null" ||
                                                                               hurll != null)
                                                                           ? Read(
+                                                                              linkch: linkch,
                                                                               link: hurll,
                                                                               linkkomik: widget.lnk,
                                                                               urut: hurutt,
@@ -908,6 +932,7 @@ class _DetailState extends State<Detail> {
                                                                 ['title']),
                                                         onTap: () async {
                                                           Get.to(() => Read(
+                                                                linkch: linkch,
                                                                 link: linkch[i][
                                                                         'attributes']
                                                                     ['href'],

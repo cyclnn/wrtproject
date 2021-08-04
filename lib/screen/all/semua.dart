@@ -60,8 +60,7 @@ class _AllKomState extends State<AllKom> {
               // Keep a reference to the ad so you can show it later.
               _interstitialAd = ad;
             },
-            onAdFailedToLoad: (LoadAdError error) {
-            },
+            onAdFailedToLoad: (LoadAdError error) {},
           ));
     }
   }
@@ -86,23 +85,23 @@ class _AllKomState extends State<AllKom> {
           color: Const.bgcolor,
         ),
         width: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(8),
-                child: Text(
-                  'SEMUA KOMIK (PAGE $num)',
-                  style: TextStyle(
-                      color: Const.text2, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Divider(
-                color: Colors.grey,
-              ),
-              komikLoad
-                  ? Wrap(
+        child: komikLoad
+            ? SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        'SEMUA KOMIK (PAGE $num)',
+                        style: TextStyle(
+                            color: Const.text2, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Divider(
+                      color: Colors.grey,
+                    ),
+                    Wrap(
                       alignment: WrapAlignment.center,
                       children: [
                         for (var i = 0; i < namakomik.length; i++)
@@ -187,17 +186,21 @@ class _AllKomState extends State<AllKom> {
                         )
                       ],
                     )
-                  : Container(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height,
-                      child: Center(
-                          child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.deepPurple),
-                      )),
-                    )
-            ],
-          ),
-        ));
+                  ],
+                ),
+              )
+            : Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                        child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                    )),
+                  )
+                ],
+              ));
   }
 }

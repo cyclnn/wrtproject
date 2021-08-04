@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../mesin/const.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:nuts_activity_indicator/nuts_activity_indicator.dart';
 
 nativeRead(
   int panjang,
@@ -66,11 +67,14 @@ nativeRead(
                           width: double.infinity,
                           height: 250,
                           child: Center(
-                            child: CircularProgressIndicator(
-                              value: downloadProgress.progress,
-                              valueColor: new AlwaysStoppedAnimation<Color>(
-                                  Const.text2),
-                            ),
+                            child: NutsActivityIndicator(
+                                radius: 18,
+                                activeColor: Colors.deepPurpleAccent,
+                                inactiveColor: Colors.red,
+                                tickCount: 11,
+                                startRatio: 0.55,
+                                animationDuration: Duration(milliseconds: 700),
+                              ),
                           ),
                         ),
                         errorWidget: (context, url, error) => Container(

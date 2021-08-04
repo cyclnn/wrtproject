@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:wrtproject/mesin/database.dart';
 import 'package:wrtproject/mesin/register.dart';
 import 'package:get/get.dart';
+import 'package:alert/alert.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+FirebaseAuth auth = FirebaseAuth.instance;
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _email = TextEditingController();
@@ -31,7 +33,6 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth auth = FirebaseAuth.instance;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Padding(
@@ -101,26 +102,13 @@ class LoginScreen extends StatelessWidget {
                   ),
                   onPressed: () async {
                     try {
-                      auth.signInWithEmailAndPassword(
-                          email: _email.text, password: _password.text);
+                      UserCredential result =
+                          await auth.signInWithEmailAndPassword(
+                              email: _email.text, password: _password.text);
+                      User user = result.user;
+                      return user;
                     } on FirebaseAuthException catch (e) {
-                      Alert(
-                        context: context,
-                        type: AlertType.error,
-                        title: "Gagal Login",
-                        desc: e.message,
-                        buttons: [
-                          DialogButton(
-                            child: Text(
-                              "Oke",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                            onPressed: () => Get.back(),
-                            width: 120,
-                          )
-                        ],
-                      ).show();
+                      Alert(message: e.message).show();
                     }
                   },
                 ),

@@ -10,7 +10,6 @@ import 'package:wrtproject/screen/setting/setting.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -69,7 +68,7 @@ class _HomeState extends State<Home> {
                   : updateMode(cekupdate['version'], cekupdate['Message'],
                       cekupdate['Link'])
               : maintenanceMode("Mohon Maaf Server WRT Sedang Maintenance")
-          : maintenanceMode("Loading..."),
+          : maintenanceMode("Checking..."),
       bottomNavigationBar: SizedBox(
         height: 60,
         child: BottomNavigationBar(

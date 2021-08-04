@@ -73,6 +73,7 @@ class _KomenState extends State<Komen> {
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Const.baseColor);
+    Size screensize = MediaQuery.of(context).size;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -83,18 +84,36 @@ class _KomenState extends State<Komen> {
           ),
           body: SafeArea(
               child: Column(children: <Widget>[
-            // TextField(
-            //   decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
-            //   controller: urlController,
-            //   keyboardType: TextInputType.url,
-            //   onSubmitted: (value) {
-            //     var url = Uri.parse(value);
-            //     if (url.scheme.isEmpty) {
-            //       url = Uri.parse("https://www.google.com/search?q=" + value);
-            //     }
-            //     webViewController?.loadUrl(urlRequest: URLRequest(url: url));
-            //   },
-            // ),
+            Container(
+              width: screensize.width,
+              margin: EdgeInsets.all(10),
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.redAccent,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(4)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 4,
+                    blurRadius: 5,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Jika telah melakukan Login Disqus anda akan stuck di loading, silahkan kembali ke halaman sebelumnya, kemudian klik Komentar",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -168,8 +187,7 @@ class _KomenState extends State<Komen> {
                         urlController.text = this.url;
                       });
                     },
-                    onConsoleMessage: (controller, consoleMessage) {
-                    },
+                    onConsoleMessage: (controller, consoleMessage) {},
                   ),
                   progress < 1.0
                       ? LinearProgressIndicator(value: progress)
@@ -180,18 +198,6 @@ class _KomenState extends State<Komen> {
             ButtonBar(
               alignment: MainAxisAlignment.center,
               children: <Widget>[
-                // ElevatedButton(
-                //   child: Icon(Icons.arrow_back),
-                //   onPressed: () {
-                //     webViewController?.goBack();
-                //   },
-                // ),
-                // ElevatedButton(
-                //   child: Icon(Icons.arrow_forward),
-                //   onPressed: () {
-                //     webViewController?.goForward();
-                //   },
-                // ),
                 ElevatedButton(
                   child: Icon(Icons.refresh),
                   onPressed: () {

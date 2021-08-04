@@ -360,7 +360,7 @@ class _SettingState extends State<Setting> {
                                                                     5),
                                                             child: Center(
                                                               child: Text(
-                                                                "Native (Default)",
+                                                                "Default",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         16,
@@ -430,7 +430,7 @@ class _SettingState extends State<Setting> {
                                                                     5),
                                                             child: Center(
                                                               child: Text(
-                                                                "Simpel (Coming Soon)",
+                                                                "Lazy",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         16,
@@ -629,7 +629,23 @@ class _SettingState extends State<Setting> {
                     padding: EdgeInsets.only(left: 8),
                     child: InkWell(
                       onTap: () async {
-                        await DefaultCacheManager().emptyCache();
+                        await DefaultCacheManager()
+                            .emptyCache()
+                            .then((value) => Alert(
+                                  context: context,
+                                  title: "Sukses",
+                                  buttons: [
+                                    DialogButton(
+                                      child: Text(
+                                        "Oke",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                      width: 120,
+                                    )
+                                  ],
+                                ).show());
                       },
                       child: Container(
                         width: double.infinity,

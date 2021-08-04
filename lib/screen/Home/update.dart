@@ -100,6 +100,8 @@ class UpdatePJ2 extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Map<String, String> header = {"referer": "https://wrt.my.id"};
+
     return Padding(
       padding: EdgeInsets.only(left: 8, right: 8),
       child: Column(
@@ -127,6 +129,7 @@ class UpdatePJ2 extends StatelessWidget {
             width: 140,
             height: 180,
             child: CachedNetworkImage(
+              httpHeaders: header,
               imageUrl: komikImg,
               fit: BoxFit.fill,
               placeholder: (context, url) => Container(

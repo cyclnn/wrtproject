@@ -11,17 +11,19 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:wrtproject/screen/loading/loading.dart';
 import 'package:wrtproject/screen/read/native.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wrtproject/screen/read/simpel.dart';
 import 'package:wrtproject/screen/read/webview.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:get/get.dart';
+import 'lazy.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Read extends StatefulWidget {
   final String link, linkkomik, namakom, linkdet, img, id;
   final int urut;
+  final List<Map<String, dynamic>> linkch;
+
   const Read(
       {Key key,
+      this.linkch,
       this.link,
       this.id,
       this.linkkomik,
@@ -38,7 +40,6 @@ class _ReadState extends State<Read> {
   List<Map<String, dynamic>> core;
   List<Map<String, dynamic>> habib;
   List<Map<String, dynamic>> prev;
-  List<Map<String, dynamic>> linkch;
   List<Map<String, dynamic>> blogger;
   List<Map<String, dynamic>> imgbox;
   List<Map<String, dynamic>> kc;
@@ -109,17 +110,6 @@ class _ReadState extends State<Read> {
     });
   }
 
-  void fetchlink() async {
-    String tempBaseUrl = widget.linkkomik.split(".my.id")[0] + ".my.id";
-    String tempRoute = widget.linkkomik.split(".my.id")[1];
-
-    final scraper = WebScraper(tempBaseUrl);
-    if (await scraper.loadWebPage(tempRoute)) {
-      linkch = scraper.getElement(
-          "div.eplister > ul > li > div.chbox > div.eph-num > a ", ['href']);
-    }
-  }
-
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
@@ -136,7 +126,7 @@ class _ReadState extends State<Read> {
   void initState() {
     super.initState();
     fetchInfo();
-    fetchlink();
+    print(widget.linkch.length);
     recent();
   }
 
@@ -146,8 +136,8 @@ class _ReadState extends State<Read> {
     var gbr = widget.img;
 
     return (load == 1)
-        ? CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
+        ? Scaffold(
+            appBar: CupertinoNavigationBar(
               // Try removing opacity to observe the lack of a blur effect and of sliding content.
               backgroundColor: Const.baseColor,
               middle: Text(
@@ -155,8 +145,9 @@ class _ReadState extends State<Read> {
                 style: TextStyle(color: Const.text3),
               ),
             ),
-            child: GestureDetector(
-              onTap: () {
+            body: GestureDetector(
+              onTap: () async {
+                await Future.delayed(Duration(milliseconds: 100));
                 modalBottom(gbr);
               },
               child: Container(
@@ -174,7 +165,10 @@ class _ReadState extends State<Read> {
                               controller: _refreshController,
                               enablePullDown: true,
                               onRefresh: _onRefresh,
-                              child: nativeRead(panjang, url, blogger))),
+                              child: LazyRead(
+                                  panjang: panjang,
+                                  url: url,
+                                  blogger: blogger))),
             ))
         : loadingScreen(screensize);
   }
@@ -211,6 +205,8 @@ class _ReadState extends State<Read> {
 
   // Modal Bottom
   modalBottom(String gbr) {
+    Map<String, String> header = {"referer": "https://wrt.my.id"};
+
     return showModalBottomSheet(
         context: context,
         shape: RoundedRectangleBorder(
@@ -268,7 +264,12 @@ class _ReadState extends State<Read> {
                           children: [
                             Container(
                               width: 80,
-                              child: Image.network(gbr),
+                              child: CachedNetworkImage(
+                                  imageUrl: gbr,
+                                  httpHeaders: header,
+                                  fit: BoxFit.fill,
+                                  height: 100,
+                                  width: 150),
                             )
                           ],
                         ),
@@ -302,7 +303,7 @@ class _ReadState extends State<Read> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      (widget.urut < linkch.length)
+                      (widget.urut < widget.linkch.length)
                           ? IconButton(
                               icon: Icon(Icons.arrow_back),
                               onPressed: () {
@@ -312,11 +313,12 @@ class _ReadState extends State<Read> {
                                     .pushReplacement(PageTransition(
                                         type: PageTransitionType.bottomToTop,
                                         child: Read(
+                                          linkch: widget.linkch,
                                           img: gbr,
                                           id: widget.id,
                                           urut: widget.urut + 1,
                                           linkkomik: widget.linkkomik,
-                                          link: linkch[widget.urut + 1]
+                                          link: widget.linkch[widget.urut + 1]
                                               ['attributes']['href'],
                                           namakom: widget.namakom,
                                         )));
@@ -331,11 +333,12 @@ class _ReadState extends State<Read> {
                                     .pushReplacement(PageTransition(
                                         type: PageTransitionType.bottomToTop,
                                         child: Read(
+                                          linkch: widget.linkch,
                                           img: gbr,
                                           id: widget.id,
                                           urut: widget.urut - 1,
                                           linkkomik: widget.linkkomik,
-                                          link: linkch[widget.urut - 1]
+                                          link: widget.linkch[widget.urut - 1]
                                               ['attributes']['href'],
                                           namakom: widget.namakom,
                                         )));

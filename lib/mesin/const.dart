@@ -14,7 +14,7 @@ class Const {
   static Color cardcolor = Colors.white;
 
   // App
-  static String version = "3.0.0";
+  static String version = "3.5.0";
 
   // Ads Code
   static String ins1 = "ca-app-pub-2816272273438312/8202383214";

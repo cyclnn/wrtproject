@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wrtproject/mesin/cek_update.dart';
 import 'package:wrtproject/mesin/const.dart';
 import 'package:wrtproject/screen/bloc/modebaca_bloc.dart';
 import 'package:wrtproject/screen/bloc/setting_bloc.dart';
@@ -17,7 +16,6 @@ import 'package:get/get.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:hive/hive.dart';
-import 'mesin/global.dart' as globals;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,22 +35,13 @@ Future<void> initPlatformState() async {
     legt2 = value.data();
   });
 
- 
-
   prefs.setInt("Ads1", legt2['home']);
   prefs.setInt("Ads2", legt2['chapter']);
   prefs.setInt("Ads3", legt2['listpage']);
 
   OneSignal.shared.setAppId("be7dac02-14fd-470f-bf7d-5ba24e08bdd2");
 
-  OneSignal.shared.setNotificationOpenedHandler((openedResult) {
-    var data = openedResult.notification.additionalData;
-
-    globals.appNavigator.currentState.push(MaterialPageRoute(
-        builder: (context) => Tes(
-              postId: data['post_id'],
-            )));
-  });
+  OneSignal.shared.setNotificationOpenedHandler((openedResult) {});
   (prefs.getBool("notif") == null)
       ? perm = false
       : perm = prefs.getBool("notif");
@@ -61,7 +50,6 @@ Future<void> initPlatformState() async {
 }
 
 Future<void> main() async {
-  globals.appNavigator = GlobalKey<NavigatorState>();
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Hive.initFlutter();

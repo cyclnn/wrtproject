@@ -50,15 +50,15 @@ class _GenlistState extends State<Genlist> {
             color: Const.bgcolor,
           ),
           width: double.infinity,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Divider(
-                  color: Colors.grey,
-                ),
-                komikLoad
-                    ? Wrap(
+          child: komikLoad
+              ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Divider(
+                        color: Colors.grey,
+                      ),
+                      Wrap(
                         children: [
                           for (var i = 0; i < namagenre.length; i++)
                             GestureDetector(
@@ -110,18 +110,17 @@ class _GenlistState extends State<Genlist> {
                             )
                         ],
                       )
-                    : Container(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height,
-                        child: Center(
-                            child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Const.text2),
-                        )),
-                      )
-              ],
-            ),
-          )),
+                    ],
+                  ),
+                )
+              : Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(
+                      child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Const.text2),
+                  )),
+                )),
     );
   }
 }

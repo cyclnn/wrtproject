@@ -14,6 +14,7 @@ class Populer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> header = {"referer": "https://wrt.my.id"};
     return Padding(
         padding: EdgeInsets.only(left: 8),
         child: Container(
@@ -43,6 +44,7 @@ class Populer extends StatelessWidget {
                 width: 150,
                 height: 160,
                 child: CachedNetworkImage(
+                  httpHeaders: header,
                   imageUrl: komikImg,
                   fit: BoxFit.fill,
                   placeholder: (context, url) => Container(

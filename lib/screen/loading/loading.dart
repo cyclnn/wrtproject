@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../mesin/const.dart';
 
 loadingScreen(var screensize) {
-  
   return Stack(
     children: [
       Container(
@@ -16,13 +15,6 @@ loadingScreen(var screensize) {
                 CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Const.text2),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  "Loading...",
-                  style: TextStyle(fontSize: 18, color: Const.text2),
-                )
               ],
             ),
           ))

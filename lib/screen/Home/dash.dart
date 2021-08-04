@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import '../../mesin/const.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class Dash extends StatefulWidget {
   @override
@@ -93,8 +92,6 @@ class _DashState extends State<Dash> {
     ads2 = ad.getInt("Ads2");
   }
 
-
-
   @override
   void initState() {
     addStringToSF();
@@ -170,7 +167,6 @@ class _DashState extends State<Dash> {
                       SizedBox(
                         height: 10,
                       ),
-                      
                       donasi(),
                       populerCard(
                           hotlist, hotnama, hotch, rating, link, ads, ads2),

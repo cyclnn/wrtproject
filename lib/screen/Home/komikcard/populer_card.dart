@@ -24,8 +24,7 @@ populerCard(
             // Keep a reference to the ad so you can show it later.
             _interstitialAd = ad;
           },
-          onAdFailedToLoad: (LoadAdError error) {
-          },
+          onAdFailedToLoad: (LoadAdError error) {},
         ));
   }
   return Container(
@@ -76,17 +75,17 @@ populerCard(
                           rating: double.parse(rating[i]['title'])),
                       onTap: () async {
                         Get.to(
-                            () => Detail(
-                                  lnk: link[i]['attributes']['href'],
-                                  gambar: hotlist[i]['attributes']['src'],
-                                  nama: hotnama[i]['attributes']['title'],
-                                  urut: i,
-                                  ads: ads2,
-                                ),
-                            transition: Transition.downToUp).then((value) {
-                                                      if (ads == 1)  _interstitialAd.show();
-
-                            });
+                                () => Detail(
+                                      lnk: link[i]['attributes']['href'],
+                                      gambar: hotlist[i]['attributes']['src'],
+                                      nama: hotnama[i]['attributes']['title'],
+                                      urut: i,
+                                      ads: ads2,
+                                    ),
+                                transition: Transition.downToUp)
+                            .then((value) {
+                          if (ads == 1) _interstitialAd.show();
+                        });
                       })
               ],
             ),

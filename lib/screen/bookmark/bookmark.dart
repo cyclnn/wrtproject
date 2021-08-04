@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wrtproject/screen/detailpage/detail.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Bookmark extends StatefulWidget {
   @override
@@ -34,6 +35,8 @@ class _BookmarkState extends State<Bookmark> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> header = {"referer": "https://wrt.my.id"};
+
     var title = Hive.box('title');
     var url = Hive.box('url');
     var gambar = Hive.box('gambar');
@@ -110,7 +113,6 @@ class _BookmarkState extends State<Bookmark> {
                                                   children: [
                                                     Container(
                                                       decoration: BoxDecoration(
-                                                        color: Colors.redAccent,
                                                         borderRadius:
                                                             BorderRadius.only(
                                                                 bottomLeft:
@@ -144,29 +146,21 @@ class _BookmarkState extends State<Bookmark> {
                                                               .size
                                                               .width /
                                                           3.5,
-                                                      height: 160,
-                                                      child: Image.network(
-                                                        gambar.getAt(i),
+                                                      height: 180,
+                                                      child: CachedNetworkImage(
+                                                        httpHeaders: header,
+                                                        imageUrl:
+                                                            gambar.getAt(i),
                                                         fit: BoxFit.fill,
-                                                        loadingBuilder: (context,
-                                                            child,
-                                                            loadingprogress) {
-                                                          if (loadingprogress ==
-                                                              null)
-                                                            return child;
-                                                          return Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    color: Colors
-                                                                        .grey),
-                                                            width: MediaQuery
-                                                                        .maybeOf(
-                                                                            context)
-                                                                    .size
-                                                                    .width /
-                                                                3.5,
-                                                            height: 160,
-                                                            child: Center(
+                                                        placeholder:
+                                                            (context, url) =>
+                                                                Container(
+                                                          width: 130,
+                                                          height: 180,
+                                                          child: Center(
+                                                            child: SizedBox(
+                                                              width: 20,
+                                                              height: 20,
                                                               child:
                                                                   CircularProgressIndicator(
                                                                 valueColor:
@@ -174,10 +168,14 @@ class _BookmarkState extends State<Bookmark> {
                                                                             Color>(
                                                                         Colors
                                                                             .deepPurple),
+                                                                strokeWidth: 2,
                                                               ),
                                                             ),
-                                                          );
-                                                        },
+                                                          ),
+                                                        ),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            Icon(Icons.error),
                                                       ),
                                                     ),
                                                   ]),
@@ -243,6 +241,12 @@ class _BookmarkState extends State<Bookmark> {
                               textStyle: TextStyle(fontSize: 20))),
                     ),
                   ))
-        : Container();
+        : Stack(
+            children: [
+              Center(
+                child: Text("Loading"),
+              )
+            ],
+          );
   }
 }
